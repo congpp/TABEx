@@ -16,10 +16,11 @@ public:
     ~MainWindow();
 
     bool openProject(QString strProj);
-    
+
 protected:
     void initUI();
 
+    virtual void wheelEvent(QWheelEvent *event) override;
 private slots:
     void on_actionOpen_triggered();
     void on_btnPlay_clicked(bool checked);

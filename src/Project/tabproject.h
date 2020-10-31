@@ -100,6 +100,7 @@ public:
 
     void setBeatPerMinute(int beat);
     int getBeatPerMinute();
+    int getBeatPerMinuteAdjusted();
 
     void setBeatPerSection(int beat);
     int getBeatPerSection();
@@ -120,6 +121,10 @@ public:
     QAbstractItemModel *getPreviewImageModel();
 
     void notifyModelChanged();
+
+    //通过调整节拍器的每分钟节拍数来调整整首歌的速度
+    int adjustSpeed(int beatAdjusted);
+    int getAdjustSpeed();
 protected:
     bool loadImage(QString strFileName, int index = -1);
 
@@ -136,6 +141,8 @@ private:
     ImageModel      m_imgModel;
     PreviewImageModel m_prevImgModel;
     ProjectHistory  m_history;
+
+    int m_adjustedBeat = 0; //用来暂时调速
 };
 
 #define TAB_INST TABProject::getInstance()

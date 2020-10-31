@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QTextStream>
+#include <QDateTime>
 
 const QString HISTORY_FILE_PATH("history.json");
 
@@ -19,7 +20,7 @@ ProjectHistory::~ProjectHistory()
     save();
 }
 
-bool ProjectHistory::add(QString projFile, QString uuid)
+bool ProjectHistory::add(QString projFile, QString uuid, int adjustedBeat)
 {
     projFile = projFile.toLower();
     for (auto it = m_history.begin(); it != m_history.end();)
@@ -33,6 +34,8 @@ bool ProjectHistory::add(QString projFile, QString uuid)
     ProjectHistoryInfo hi;
     hi.filePath = projFile;
     hi.uuid = uuid;
+    hi.timeAccess = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    hi.adjustedBeat = adjustedBeat;
     m_history.push_front(hi);
 
     while (m_history.size() > 10)
@@ -58,6 +61,8 @@ bool ProjectHistory::save()
         QJsonObject obj;
         obj.insert("filePath", it.filePath);
         obj.insert("uuid", it.uuid);
+        obj.insert("timeAccess", it.timeAccess);
+        obj.insert("adjustedBeat", it.adjustedBeat);
         arr.append(obj);
     }
     jsDoc.setArray(arr);
@@ -90,6 +95,8 @@ bool ProjectHistory::open()
         QJsonObject obj = it.toObject();
         hi.filePath = obj.take("filePath").toString();
         hi.uuid = obj.take("uuid").toString();
+        hi.timeAccess = obj.take("timeAccess").toString();
+        hi.adjustedBeat = obj.take("adjustedBeat").toInt();
         m_history.push_back(hi);
     }
 
@@ -99,6 +106,20 @@ bool ProjectHistory::open()
 ProjectHisotryInfoList ProjectHistory::getHistrory()
 {
     return m_history;
+}
+
+bool ProjectHistory::getProjectHistory(QString projFile, ProjectHistoryInfo& hist)
+{
+    for(auto it : m_history)
+    {
+        if (it.filePath.compare(projFile, Qt::CaseInsensitive) == 0)
+        {
+            hist = it;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 QString ProjectHistory::getSavePath()

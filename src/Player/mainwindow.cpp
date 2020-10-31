@@ -40,6 +40,16 @@ void MainWindow::initUI()
     setWindowTitle(QFileUtil::getFileName(TAB_INST->currentProject()));
 }
 
+void MainWindow::wheelEvent(QWheelEvent *event)
+{
+    event->accept();
+    int delta = event->delta();
+    if (delta > 0)
+        on_btnLeft_clicked();
+    else
+        on_btnRight_clicked();
+}
+
 bool MainWindow::openProject(QString strProj)
 {
     if (TAB_INST->openProject(strProj))

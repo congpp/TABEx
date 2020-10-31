@@ -20,8 +20,9 @@ enum PlayStatus
     PS_FINISHED,
 };
 
-class IPaintHandler
+class IPaintHandler : public QObject
 {
+    Q_OBJECT
 public:
     IPaintHandler();
     virtual ~IPaintHandler(){}
@@ -41,7 +42,7 @@ public:
     static QImagePtr getCoverImage();
 protected:
     virtual void paintCover(QPainter* painter, QRect rc);
-
+    virtual void paintInfo(QPainter* painter, QRect rc);
 protected:
     QImagePtr m_imgBg;
     QImagePtr m_imgCover;
@@ -83,8 +84,12 @@ public:
 
     virtual void init() override;
 protected:
-    QSize getFixedImageSize(QRect& rcPaint, const QRect &rcImg);
+    virtual void paintInfo(QPainter* painter, QRect rc) override;
 
+    QSize getFixedImageSize(QRect& rcPaint, const QRect &rcImg);
+    void drawRoundImage(QPainter *painter, QRect rcPaint, QImagePtr img, QRect rcImg);
+
+private:
     double m_tabLineXPos = 0.4;
 };
 

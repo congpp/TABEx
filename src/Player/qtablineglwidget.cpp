@@ -20,12 +20,6 @@ QTabLineGLWidget::QTabLineGLWidget(QWidget *parent)
     m_pTimerPlay = new QTimer(this);
     connect(m_pTimerPlay, &QTimer::timeout, this, &QTabLineGLWidget::animatePlay);
 
-    for (int i=1; i<20; ++i)
-        m_speedList.push_back(i/20.0);
-    for (int i=1; i<=20; ++i)
-        m_speedList.push_back(i);
-    m_iSpeedIndex = m_speedList.size()/2;
-
     //m_paintHandler.reset(new QHorizontalPaintHandler);
     m_paintHandler.reset(new QVerticalPaintHandler);
     m_paintHandler->setPlayStatus(&m_playStatus);
@@ -155,8 +149,6 @@ int QTabLineGLWidget::getFPS()
 void QTabLineGLWidget::speedUp()
 {
     m_iSpeedIndex--;
-    if (m_iSpeedIndex < 0)
-        m_iSpeedIndex = 0;
     adjustSpeed();
     repaint();
 }
@@ -164,15 +156,13 @@ void QTabLineGLWidget::speedUp()
 void QTabLineGLWidget::slowDown()
 {
     m_iSpeedIndex++;
-    if (m_iSpeedIndex >= m_speedList.size())
-        m_iSpeedIndex = m_speedList.size()-1;
     adjustSpeed();
     repaint();
 }
 
 void QTabLineGLWidget::resetSpeed()
 {
-    m_iSpeedIndex = m_speedList.size()/2;
+    m_iSpeedIndex = 0;
     adjustSpeed();
     repaint();
 }
@@ -214,7 +204,7 @@ void QTabLineGLWidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event);
     QPainter painter;
     painter.begin(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform);
 
     QRect rc = this->geometry();
     QRect rcLoading(rc.left() + rc.width()/2 - szLoading.width()/2, rc.top() + rc.height()/2 - szLoading.height()/2,
@@ -259,15 +249,15 @@ void QTabLineGLWidget::paintEvent(QPaintEvent *event)
     painter.end();
 }
 
-void QTabLineGLWidget::wheelEvent(QWheelEvent *event)
-{
-    event->accept();
-    int delta = event->delta();
-    if (delta > 0)
-        playNext();
-    else
-        playPrev();
-}
+//void QTabLineGLWidget::wheelEvent(QWheelEvent *event)
+//{
+//    event->accept();
+//    int delta = event->delta();
+//    if (delta > 0)
+//        playNext();
+//    else
+//        playPrev();
+//}
 
 void QTabLineGLWidget::startTimerPlayNext()
 {
@@ -293,9 +283,9 @@ void QTabLineGLWidget::startTimerPlayNext()
 
 void QTabLineGLWidget::adjustSpeed()
 {
-    double tick = TAB_INST->getSecondAtTabLine(m_iTabLine) * 1000;;
+    m_iSpeedIndex = TAB_INST->adjustSpeed(m_iSpeedIndex);
+    double currTotal = TAB_INST->getSecondAtTabLine(m_iTabLine) * 1000;;
     double lastTotal = m_iTimeTotal;
-    double currTotal = tick * m_speedList.at(m_iSpeedIndex);
     m_iTimeTotal = int(currTotal);
     m_iTimeCurrent = int(m_iTimeCurrent / (lastTotal/currTotal));
     qDebug() << "adjust speed: " << m_iTimeCurrent << "/" << m_iTimeTotal;

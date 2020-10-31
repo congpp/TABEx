@@ -83,7 +83,7 @@ public slots:
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
-    virtual void wheelEvent(QWheelEvent *event) override;
+    //virtual void wheelEvent(QWheelEvent *event) override;
 
     void startTimerPlayNext();
 
@@ -109,8 +109,7 @@ private:
 
     QSize m_szTabLineImg;
 
-    QList<double> m_speedList;
-    int m_iSpeedIndex = 10;
+    int m_iSpeedIndex = 0;
 
     PaintHandlerPtr m_paintHandler;
 };

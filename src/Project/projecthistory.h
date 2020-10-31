@@ -1,12 +1,14 @@
 #ifndef PROJECTHISTORY_H
 #define PROJECTHISTORY_H
 #include <QString>
-#include <QTime>
+#include <QList>
 
 struct ProjectHistoryInfo
 {
     QString filePath;
     QString uuid;
+    QString timeAccess;
+    int adjustedBeat = 0;
 };
 
 typedef QList<ProjectHistoryInfo> ProjectHisotryInfoList;
@@ -17,13 +19,14 @@ public:
     ProjectHistory();
     ~ProjectHistory();
 
-    bool add(QString projFile, QString uuid);
+    bool add(QString projFile, QString uuid, int adjustedBeat);
 
     bool save();
     bool open();
 
     ProjectHisotryInfoList getHistrory();
 
+    bool getProjectHistory(QString projFile, ProjectHistoryInfo &hist);
 protected:
     QString getSavePath();
 

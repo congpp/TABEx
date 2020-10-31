@@ -8,6 +8,8 @@
 static const int MAX_PREVIEW_ITEM_WIDTH  = 320;
 static const int MAX_PREVIEW_ITEM_HEIGHT = 480;
 
+static const int MAX_BEAT_PER_MINUTE = 300;
+
 static const QString PROJ_PATH_ROOT("/TABProject/");
 static const QString PROJ_PATH_TEMP("temp/");
 static const QString PROJ_PATH_IMG_DIR("img/");

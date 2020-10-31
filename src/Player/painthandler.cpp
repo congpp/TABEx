@@ -124,14 +124,20 @@ void IPaintHandler::paintCover(QPainter *painter, QRect rc)
         pcd.end();
     }
 
-    QPainter::RenderHints rh = painter->renderHints();
+    painter->save();
     painter->setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform);
     painter->translate(rc.center());
     painter->rotate(m_coverAngle);
     painter->translate(-rc.center());
     painter->drawImage(rc, cd);
     painter->resetTransform();
-    painter->setRenderHints(rh);
+    painter->restore();
+}
+
+void IPaintHandler::paintInfo(QPainter *painter, QRect rc)
+{
+    Q_UNUSED(painter);
+    Q_UNUSED(rc);
 }
 
 QImagePtr IPaintHandler::getCoverImage()
@@ -299,6 +305,16 @@ PaintHandlerType QVerticalPaintHandler::type()
     return PHT_VERTICAL;
 }
 
+void QVerticalPaintHandler::drawRoundImage(QPainter* painter, QRect rcPaint, QImagePtr img, QRect rcImg)
+{
+    QPainterPath pp;
+    pp.addRoundedRect(rcPaint, 8, 8);
+    painter->save();
+    painter->setClipPath(pp);
+    painter->drawImage(rcPaint, *img, rcImg);
+    painter->restore();
+}
+
 void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
 {
     if (!m_imgBg.isNull())
@@ -308,13 +324,18 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
 
     //cover
     QRect rcCover;
-    rcCover.setTop(rc.center().ry() - m_szCoverMax.height()/2);
+    rcCover.setTop(rc.top() + rc.height() / 3 - m_szCoverMax.height() / 2);
     rcCover.setRight(rc.left() + int(rc.width() * m_tabLineXPos));
     rcCover.setLeft(rcCover.right() - m_szCoverMax.width());
     rcCover.setBottom(rcCover.top() + m_szCoverMax.height());
     paintCover(painter, rcCover);
 
-    QBrush brFg(QColor(0,162,232,128));     //blue mask
+    //info
+    QRect rcInfo = rcCover;
+    rcInfo.adjust(0, m_szCoverMax.height(), 0, 0);
+    paintInfo(painter, rcInfo);
+
+    QBrush brFg(QColor(0,162,232,128));     //black mask
     QBrush brBg(QColor(255,255,255,64));    //white bg
 
     //封面右边，整块区域，20px padding
@@ -334,19 +355,21 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
     if (m)
     {
         sz = getFixedImageSize(rcM, m->rcPos);
-        rcM.setTop(rcTabLine.center().ry() - sz.height() / 2);
+        rcM.setTop(rcCover.center().ry() - sz.height() / 2);
+        //rcM.setTop(rcTabLine.center().ry() - sz.height() / 2);
         rcM.setWidth(sz.width());
         rcM.setHeight(sz.height());
         //可以通过控制rcM的top来产生滚动动画
         if (m_smoothScroll > 0 && m_smoothScroll < m_smoothScrollMax)
         {
-            int dist = sz.height()*(m_smoothScroll*1.0/m_smoothScrollMax);
+            int dist = int(sz.height()*(m_smoothScroll*1.0/m_smoothScrollMax));
             rcM.adjust(0,-dist,0,-dist);
             m_smoothScroll++;
             qDebug() << "Smoothing: " << m_smoothScroll << rcM;
         }
         img = pProj->getImage(m->strImg);
-        painter->drawImage(rcM, *img, m->rcPos);
+        drawRoundImage(painter, rcM, img, m->rcPos);
+        //painter->drawPath(pp);
 
         //mask
         if (m_maskPercent > 0 || m_smoothScroll > 0)
@@ -359,6 +382,8 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
         }
 
     }
+
+    painter->setOpacity(0.3);
     //top
     QRect rcL=rcTabLine;
     rcL.setBottom(rcM.top()-padding);
@@ -370,8 +395,8 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
         rcL.setTop(rcL.bottom() - sz.height());
         rcL.setWidth(sz.width());
 
-        painter->drawImage(rcL, *img, l->rcPos);
-        painter->fillRect(rcL, brFg);
+        drawRoundImage(painter, rcL, img, l->rcPos);
+        //painter->fillRect(rcL, brFg);
         rcL.setBottom(rcL.top()-padding);
     }
 
@@ -388,10 +413,11 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
         rcR.adjust(0,padding,0,0);
         rcR.setWidth(sz.width());
 
-        painter->drawImage(rcR, *img, r->rcPos);
+        drawRoundImage(painter, rcR, img, r->rcPos);
         rcR.setTop(rcR.bottom());
     }
 
+    painter->setOpacity(1.0);
     //fps
     if (m_ps && *m_ps == PS_PLAYING)
     {
@@ -412,6 +438,29 @@ void QVerticalPaintHandler::init()
 {
     IPaintHandler::init();
     m_szTabLineImg = TAB_INST->getTabLineSizeV();
+}
+
+void QVerticalPaintHandler::paintInfo(QPainter *painter, QRect rc)
+{
+    painter->save();
+    painter->setRenderHint(QPainter::TextAntialiasing);
+    QFont f1("Consolas", 16); f1.setBold(true);
+    QFont f2("Consolas", 28); f2.setBold(true);
+    QRect rcText;
+    QString str;
+    int l, t, w, h;
+    w = 60;
+    h = 40;
+    l = rc.center().rx() - w;
+    t = rc.top();
+    painter->setFont(f1);
+    painter->drawText(l, t, w, h, Qt::AlignRight|Qt::AlignVCenter, tr("BPM:"), &rcText);
+
+    str = QString::asprintf("%d", TAB_INST->getBeatPerMinuteAdjusted());
+    l = rcText.right() + 20;
+    painter->setFont(f2);
+    painter->drawText(l, t, w, h, Qt::AlignLeft|Qt::AlignVCenter, str, &rcText);
+    painter->restore();
 }
 
 QSize QVerticalPaintHandler::getFixedImageSize(QRect &rcPaint, const QRect &rcImg)

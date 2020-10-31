@@ -10,7 +10,6 @@
 #include <QUuid>
 
 TABProject::TABProject()
-    : m_nImgID(0)
 {
 }
 
@@ -81,7 +80,13 @@ bool TABProject::openProject(QString strProjFile)
         return false;
 
     m_projFile = strProjFile;
-    m_history.add(m_projFile, m_uuid);
+
+    //读取上次用户调整的速度
+    ProjectHistoryInfo hi;
+    if (m_history.getProjectHistory(m_projFile, hi))
+        m_adjustedBeat = hi.adjustedBeat;
+
+    m_history.add(m_projFile, m_uuid, m_adjustedBeat);
     return true;
 }
 
@@ -190,13 +195,16 @@ bool TABProject::saveProject(QString strProjFile, bool bTemp)
     if (!bTemp)
     {
         m_projFile = strProjFile;
-        m_history.add(m_projFile, m_uuid);
+        m_history.add(m_projFile, m_uuid, m_adjustedBeat);
     }
     return true;
 }
 
 bool TABProject::closeProject()
 {
+    if(!m_projFile.isEmpty())
+        m_history.add(m_projFile, m_uuid, m_adjustedBeat);
+
     TabProjInfo pi = {};
     m_projInfo = pi;
     m_imgMap.clear();
@@ -719,6 +727,11 @@ int TABProject::getBeatPerMinute()
     return m_projInfo.beatPerMinute;
 }
 
+int TABProject::getBeatPerMinuteAdjusted()
+{
+    return m_projInfo.beatPerMinute + m_adjustedBeat;
+}
+
 void TABProject::setBeatPerSection(int beat)
 {
     m_projInfo.beatPerSection = beat;
@@ -744,7 +757,7 @@ double TABProject::getSecondPerSection()
 {
     //已知：一个小节节拍数(4/4、6/8之类的分母)，每分钟节拍数(节拍器的读数)
     //那么可以算出一个小节的时间
-    return m_projInfo.beatPerSection * (60.0 / m_projInfo.beatPerMinute);
+    return m_projInfo.beatPerSection * (60.0 / (m_projInfo.beatPerMinute + m_adjustedBeat));
 }
 
 double TABProject::getSecondPerBeat()
@@ -805,6 +818,24 @@ void TABProject::notifyModelChanged()
     m_tlModel.notifyChanged(0, getTabLineCount());
     m_imgModel.notifyChanged(0, getImageCount());
     m_prevImgModel.notifyChanged(0, getImageCount());
+}
+
+int TABProject::adjustSpeed(int beatAdjusted)
+{
+    int beat = m_projInfo.beatPerMinute + beatAdjusted;
+    if (beat <= 0)
+        m_adjustedBeat = -m_projInfo.beatPerMinute;
+    else if (beat >= MAX_BEAT_PER_MINUTE)
+        m_adjustedBeat = MAX_BEAT_PER_MINUTE - m_projInfo.beatPerMinute;
+    else
+        m_adjustedBeat = beatAdjusted;
+
+    return m_adjustedBeat;
+}
+
+int TABProject::getAdjustSpeed()
+{
+    return m_adjustedBeat;
 }
 
 bool TABProject::loadImage(QString strFileName, int index)
