@@ -85,12 +85,15 @@ public:
     virtual void init() override;
 protected:
     virtual void paintInfo(QPainter* painter, QRect rc) override;
+    void paintProgress(QPainter* painter, QRect rc);
 
     QSize getFixedImageSize(QRect& rcPaint, const QRect &rcImg);
     void drawRoundImage(QPainter *painter, QRect rcPaint, QImagePtr img, QRect rcImg);
 
 private:
     double m_tabLineXPos = 0.4;
+    int m_numImgHeight = 0;
+    int m_numBgImgHeight = 24;
 };
 
 typedef QSharedPointer<IPaintHandler> PaintHandlerPtr;

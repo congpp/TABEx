@@ -1,4 +1,4 @@
-#include "qstringutil.h"
+﻿#include "qstringutil.h"
 #include <QTextStream>
 
 QStringUtil::QStringUtil()
@@ -17,4 +17,10 @@ QRect QStringUtil::string2Rect(QString str)
     QTextStream ts(&str);
     ts >> l >> t >> w >> h;
     return QRect(l, t, w, h);
+}
+
+QString QStringUtil::double2MMSS(double t)
+{
+    int i = int(t);
+    return QString::asprintf("%02d:%02d", i/60, i%60);
 }

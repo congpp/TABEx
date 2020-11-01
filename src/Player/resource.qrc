@@ -1,8 +1,9 @@
 <RCC>
     <qresource prefix="/image">
-        <file>resouce/image/cd.png</file>
-        <file>resouce/image/user.png</file>
-        <file>resouce/image/cover.png</file>
-        <file>resouce/logo.ico</file>
+        <file>resource/logo.ico</file>
+        <file>resource/image/cd.png</file>
+        <file>resource/image/cover.png</file>
+        <file>resource/image/triangle.png</file>
+        <file>resource/image/user.png</file>
     </qresource>
 </RCC>

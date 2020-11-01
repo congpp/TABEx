@@ -31,6 +31,7 @@ SOURCES += \
     fps.cpp \
     qtimerex.cpp \
     painthandler.cpp \
+    resourceloader.cpp \
     welcomedialog.cpp
 
 HEADERS += \
@@ -41,6 +42,7 @@ HEADERS += \
     fps.h \
     qtimerex.h \
     painthandler.h \
+    resourceloader.h \
     welcomedialog.h
 
 FORMS += \

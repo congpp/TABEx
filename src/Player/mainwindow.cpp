@@ -1,6 +1,7 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "../Project/tabproject.h"
+#include "resourceloader.h"
 #include <QtWidgets>
 #include <QDebug>
 
@@ -11,7 +12,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->widgetPlayer, &QTabLineGLWidget::signalTabLineChanged, this, &MainWindow::onPlayerTabLineChanged);
     setWindowTitle(tr("Player"));
-    setWindowIcon(QIcon(":/image/resouce/logo.ico"));
+    setWindowIcon(QIcon(":/image/resource/logo.ico"));
+
+    //资源一次性load成QImage
+    g_resLoader.loadImages();
 }
 
 MainWindow::~MainWindow()

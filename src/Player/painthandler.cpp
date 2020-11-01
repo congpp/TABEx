@@ -1,5 +1,6 @@
 ﻿#include "painthandler.h"
 #include "../Project/tabproject.h"
+#include "resourceloader.h"
 
 ///////////////////////////////////////////////////////////////////////////
 /// \brief IPaintHandler::IPaintHandler
@@ -102,13 +103,12 @@ void IPaintHandler::paintCover(QPainter *painter, QRect rc)
         m_coverAngle%=360;
     }
 
-    static QImage cdOri(":/image/resouce/image/cd.png");
     static QImage cd;
     static QImagePtr lastCover;
     QImagePtr imgCover = getCoverImage();
     if (lastCover != imgCover)
     {
-        cd = cdOri.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+        cd = g_resLoader.getImage(RID_IMG_CD)->convertToFormat(QImage::Format_ARGB32_Premultiplied);
         QPainter pcd;
         pcd.begin(&cd);
         pcd.setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform);
@@ -148,7 +148,7 @@ QImagePtr IPaintHandler::getCoverImage()
         return pProjCover;
 
     if (!pImgCover)
-        pImgCover.reset(new QImage(":/image/resouce/image/cover.png"));
+        pImgCover = g_resLoader.getImage(RID_IMG_COVER);
     return pImgCover;
 }
 
@@ -318,7 +318,13 @@ void QVerticalPaintHandler::drawRoundImage(QPainter* painter, QRect rcPaint, QIm
 void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
 {
     if (!m_imgBg.isNull())
+    {
+        //TODO 模仿云音乐，让bg不失真
+        //int w=rc.width();
+        //QRect rcImg(rc);
+        //rcImg.setHeight(w);
         painter->drawImage(rc, *m_imgBg);
+    }
 
     TABProject* pProj = TAB_INST;
 
@@ -335,8 +341,8 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
     rcInfo.adjust(0, m_szCoverMax.height(), 0, 0);
     paintInfo(painter, rcInfo);
 
-    QBrush brFg(QColor(0,162,232,128));     //black mask
-    QBrush brBg(QColor(255,255,255,64));    //white bg
+    //QBrush brFg(QColor(0,162,232,128));     //black mask
+    //QBrush brBg(QColor(255,255,255,64));    //white bg
 
     //封面右边，整块区域，20px padding
     const int padding = 20;
@@ -372,15 +378,12 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
         //painter->drawPath(pp);
 
         //mask
-        if (m_maskPercent > 0 || m_smoothScroll > 0)
-        {
-            QRect rcMask=rcM;
-            if (m_smoothScroll == 0)
-                rcMask.setWidth(int(m_maskPercent * rcM.width()));
-            //qDebug() << "rcMask" << rcMask;
-            painter->fillRect(rcMask, brFg);
-        }
+        QRect rcMask=rcM;
+        rcMask.setTop(rcM.bottom());
+        rcMask.setBottom(rcMask.top() + padding);
+        paintProgress(painter, rcMask);
 
+        rcM.setBottom(rcM.bottom() + m_numImgHeight);
     }
 
     painter->setOpacity(0.3);
@@ -442,24 +445,132 @@ void QVerticalPaintHandler::init()
 
 void QVerticalPaintHandler::paintInfo(QPainter *painter, QRect rc)
 {
+    TABProject* proj = TAB_INST;
+    TabLinePtr tl = proj->getTabLineAt(m_iTabLine);
+    if (tl.isNull())
+        return;
+
     painter->save();
     painter->setRenderHint(QPainter::TextAntialiasing);
-    QFont f1("Consolas", 16); f1.setBold(true);
-    QFont f2("Consolas", 28); f2.setBold(true);
-    QRect rcText;
-    QString str;
-    int l, t, w, h;
-    w = 60;
-    h = 40;
-    l = rc.center().rx() - w;
-    t = rc.top();
-    painter->setFont(f1);
-    painter->drawText(l, t, w, h, Qt::AlignRight|Qt::AlignVCenter, tr("BPM:"), &rcText);
+    //cover下面区域切成左右两边
+    //左边标题，底部+右对齐
+    //右边值，底部+左对齐
+    const int infoHeight = 36;
+    const int textPadding = 5;
+    QRect rcL(rc);
+    rcL.setWidth(rc.width()/2 - textPadding);
+    rcL.setHeight(infoHeight);
+    QRect rcR(rc);
+    rcR.setLeft(rc.left()+rc.width()/2 + textPadding);
+    rcR.setHeight(infoHeight);
 
-    str = QString::asprintf("%d", TAB_INST->getBeatPerMinuteAdjusted());
-    l = rcText.right() + 20;
-    painter->setFont(f2);
-    painter->drawText(l, t, w, h, Qt::AlignLeft|Qt::AlignVCenter, str, &rcText);
+    QFont f1("", 16); f1.setBold(true);
+    QFont f2("", 26); f2.setBold(true);
+    QPen pen(QColor(0xFF,0xFF,0xFF));
+    QString str;
+
+    struct InfoMap
+    {
+        QString key;
+        QString val;
+    } ims[]=
+    {
+        {tr("Song Time:"), QStringUtil::double2MMSS(proj->getSecondOfThisSong())},
+        {tr("Speed:"), QString::asprintf("%d", proj->getBeatPerMinuteAdjusted())},
+        {tr("Sections:"), QString::asprintf("%d", tl->sections)},
+        {tr("Time:"), QString::asprintf("%.2f", proj->getSecondAtTabLine(m_iTabLine)*(1-m_maskPercent))},
+    };
+
+    for (auto im : ims)
+    {
+        painter->setPen(pen);
+        painter->setFont(f1);
+        painter->drawText(rcL, Qt::AlignRight|Qt::AlignVCenter, im.key);
+        //painter->drawRect(rcL);
+
+        painter->setFont(f2);
+        painter->drawText(rcR, Qt::AlignLeft|Qt::AlignVCenter, im.val);
+        //painter->drawRect(rcR);
+
+        rcL.moveTop(rcL.bottom());
+        rcR.moveTop(rcR.bottom());
+    }
+
+    painter->restore();
+}
+
+void QVerticalPaintHandler::paintProgress(QPainter *painter, QRect rc)
+{
+    if (m_maskPercent < 0.01)
+        return;
+
+    TABProject* proj = TAB_INST;
+    TabLinePtr tl = proj->getTabLineAt(m_iTabLine);
+    if (tl.isNull())
+        return;
+
+    painter->save();
+
+    ////一个section只接受1 2 4 8个指示图片
+    QImagePtr img = g_resLoader.getImage(RID_IMG_TRIANGLE);
+    QRect rcImg(rc.left(), rc.top(), img->width(), img->height());
+    int left = int(rc.left() + (rc.width() - img->width()) * m_maskPercent);
+    rcImg.moveLeft(left);
+    painter->drawImage(rcImg, *img, img->rect());
+
+    ////int wSection = beat * m_numImgHeight;
+    ////int beats = beat * sections;
+    //int numImgPadding = 0;
+    //const int validImgCountPerSec[]={1, 2, 4, 8};
+    //int imgCountPerSec = 0;
+    //for (int i=3; i>=0; --i)
+    //{
+    //    int wTotal = sections * m_numImgHeight + sections * (validImgCountPerSec[i] - 1) * m_numBgImgHeight;
+    //    if (wTotal > w)
+    //        continue;
+    //
+    //    imgCountPerSec = validImgCountPerSec[i];
+    //    numImgPadding = (w-wTotal)/(imgCountPerSec*sections);
+    //    break;
+    //}
+    //
+    //if (imgCountPerSec > 0)
+    //{
+    //    //TODO paint number image
+    //    QRect rcNum(rc.left(), rc.top(), m_numImgHeight, m_numImgHeight);
+    //    QRect rcNumBg(rc.left(), rc.top(), m_numBgImgHeight, m_numBgImgHeight);
+    //    int wPercent = rc.left() + m_maskPercent * w;
+    //
+    //    for (int s=1; s <= sections; ++s)
+    //    {
+    //        for(int n=1; n<=imgCountPerSec; ++n)
+    //        {
+    //            QRect rcUse;
+    //            QImagePtr pImg;
+    //            if (n==1)
+    //            {
+    //                rcUse = rcNum;
+    //                ResourceID rid;
+    //                if (s <= RID_IMG_NUMBER_8)
+    //                    rid = ResourceID(s%RID_IMG_NUMBER_8);
+    //                else
+    //                    rid = ResourceID(s-1+RID_IMG_NUMBER_BG_1);
+    //                pImg = g_resLoader.getImage(rid);
+    //            }
+    //            else
+    //            {
+    //                rcUse = rcNumBg;
+    //                ResourceID rid = ResourceID(s-1+RID_IMG_NUMBER_BG_1);
+    //                pImg = g_resLoader.getImage(rid);
+    //            }
+    //            if (rcUse.left() > wPercent)
+    //                painter->setOpacity(0.5);
+    //            painter->drawImage(rcUse, *pImg, pImg->rect());
+    //            rcNum.moveLeft(rcNum.left() + rcUse.width() + numImgPadding);
+    //            rcNumBg.moveLeft(rcNumBg.left() + rcUse.width() + numImgPadding);
+    //        }
+    //    }
+    //}
     painter->restore();
 }
 

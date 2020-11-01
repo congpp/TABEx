@@ -773,6 +773,11 @@ double TABProject::getSecondAtTabLine(int iTabLine)
     return m_projInfo.tabLines.at(iTabLine)->sections * getSecondPerSection();
 }
 
+double TABProject::getSecondOfThisSong()
+{
+    return getSectionCount() * getSecondPerSection();
+}
+
 QJsonObject TABProject::tabLine2Json(TabLinePtr tl)
 {
     QJsonObject jsTab;

@@ -1,4 +1,4 @@
-#ifndef TABPROJECT_H
+﻿#ifndef TABPROJECT_H
 #define TABPROJECT_H
 #include "commondefine.h"
 #include "../Utils/utils.h"
@@ -112,6 +112,7 @@ public:
     double getSecondPerSection();
     double getSecondPerBeat();
     double getSecondAtTabLine(int iTabLine);
+    double getSecondOfThisSong();
 
     QJsonObject tabLine2Json(TabLinePtr tl);
     TabLinePtr  json2TabLine(QJsonObject js);

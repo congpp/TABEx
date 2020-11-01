@@ -148,14 +148,14 @@ int QTabLineGLWidget::getFPS()
 
 void QTabLineGLWidget::speedUp()
 {
-    m_iSpeedIndex--;
+    m_iSpeedIndex++;
     adjustSpeed();
     repaint();
 }
 
 void QTabLineGLWidget::slowDown()
 {
-    m_iSpeedIndex++;
+    m_iSpeedIndex--;
     adjustSpeed();
     repaint();
 }
@@ -239,7 +239,7 @@ void QTabLineGLWidget::paintEvent(QPaintEvent *event)
     case TLS_DONE:
     {
         m_paintHandler->setBackgroundImage(m_thread.m_imgCoverBlur);
-        m_paintHandler->setTabLineMaskPercent(m_iTimeCurrent*1.0/m_iTimeTotal);
+        m_paintHandler->setTabLineMaskPercent(m_iTimeTotal==0 ? 0 : m_iTimeCurrent*1.0/m_iTimeTotal);
         m_paintHandler->onPaint(&painter, rc);
 
         break;
