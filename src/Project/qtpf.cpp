@@ -92,6 +92,41 @@ bool QTPF::releaseToDir(QString dirPath)
     return true;
 }
 
+QImagePtr QTPF::loadCoverImage(QString tpf)
+{
+    QFile f(tpf);
+    if (!f.open(QIODevice::ReadOnly))
+        return nullptr;
+
+    TPFHeader tpfh = {};
+    while(!f.atEnd())
+    {
+        f.read(reinterpret_cast<char*>(&tpfh), sizeof(tpfh));
+        switch (tpfh.type)
+        {
+        case TPFHT_CONFIG:
+        case TPFHT_SINGER_IMAGE:
+        case TPFHT_IMAGES:
+            f.seek(f.pos() + tpfh.length);
+            break;
+        case TPFHT_COVER_IMAGE:
+        {
+            QByteArray arr = f.read(tpfh.length);
+            QImage img = QImage::fromData(arr);
+            if (img.isNull())
+                return nullptr;
+
+            QImagePtr ptr(new QImage(img));
+            return ptr;
+        }
+        default:
+            return nullptr;
+        }
+    }
+
+    return nullptr;
+}
+
 bool QTPF::releaseFile(QString dirPath, TPFHeader tpfh)
 {
     QString strFile;

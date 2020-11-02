@@ -120,6 +120,7 @@ public:
     QAbstractItemModel *getTabLineModel();
     QAbstractItemModel *getImageModel();
     QAbstractItemModel *getPreviewImageModel();
+    QAbstractTableModel *getHistoryModel();
 
     void notifyModelChanged();
 

@@ -22,9 +22,13 @@ public:
 
     void loadImages();
 
+    void registerExternalImage(QString key, QImagePtr img);
+    QImagePtr findExternalImage(QString key);
+
     static ResourceLoader& instance();
 protected:
     QMap<int, QImagePtr> m_imgs;
+    QMap<QString, QImagePtr> m_extImgs;
 };
 
 #define g_resLoader ResourceLoader::instance()

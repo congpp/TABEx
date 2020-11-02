@@ -227,12 +227,8 @@ void QTabLineGLWidget::paintEvent(QPaintEvent *event)
     case TLS_BG_LOADED:
     case TLS_TABLINE_LOADING:
     {
-        QPen pen(Qt::blue), pen2(Qt::red);
-        painter.setPen(pen);
-
-        painter.drawEllipse(rcLoading);
-        painter.setPen(pen2);
-        painter.drawPie(rcLoading, m_iTabLine*10*16%5760, 90*16);
+        static const QBrush br(QColor(0xFF,0xFF,0xFF));
+        painter.fillRect(rc, br);
         break;
     }
     case TLS_TABLINE_LOADED:

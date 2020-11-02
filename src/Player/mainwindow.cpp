@@ -13,9 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widgetPlayer, &QTabLineGLWidget::signalTabLineChanged, this, &MainWindow::onPlayerTabLineChanged);
     setWindowTitle(tr("Player"));
     setWindowIcon(QIcon(":/image/resource/logo.ico"));
-
-    //资源一次性load成QImage
-    g_resLoader.loadImages();
 }
 
 MainWindow::~MainWindow()
@@ -59,6 +56,7 @@ bool MainWindow::openProject(QString strProj)
     if (TAB_INST->openProject(strProj))
     {
         initUI();
+        show();
         return true;
     }
 

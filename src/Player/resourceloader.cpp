@@ -27,6 +27,23 @@ void ResourceLoader::loadImages()
 
 }
 
+void ResourceLoader::registerExternalImage(QString key, QImagePtr img)
+{
+    if (img.isNull())
+        return;
+
+    m_extImgs[key] = img;
+}
+
+QImagePtr ResourceLoader::findExternalImage(QString key)
+{
+    auto it = m_extImgs.find(key);
+    if (it == m_extImgs.end())
+        return nullptr;
+
+    return it.value();
+}
+
 ResourceLoader &ResourceLoader::instance()
 {
     static ResourceLoader resLoader;

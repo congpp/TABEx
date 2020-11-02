@@ -122,6 +122,47 @@ bool ProjectHistory::getProjectHistory(QString projFile, ProjectHistoryInfo& his
     return false;
 }
 
+int ProjectHistory::rowCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    int size = m_history.size();
+    int col = columnCount(parent);
+    return size / col + (size % col != 0);
+}
+
+int ProjectHistory::columnCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return 2;
+}
+
+QVariant ProjectHistory::data(const QModelIndex &index, int role) const
+{
+    Q_UNUSED(index);
+    Q_UNUSED(role);
+    if (role == Qt::DisplayRole)
+    {
+        int col = index.column(), row = index.row();
+        int colCount = columnCount(index);
+        int index = row * colCount + col;
+        if (index >= m_history.size())
+            return QVariant();
+
+        ProjectHistoryInfo phi = m_history.at(index);
+        QStringList strs;
+        strs << phi.filePath << phi.timeAccess;
+        return QVariant(strs);
+
+    }
+    return QVariant();
+}
+
+Qt::ItemFlags ProjectHistory::flags(const QModelIndex &index) const
+{
+    Q_UNUSED(index);
+    return Qt::ItemIsEnabled|Qt::ItemIsSelectable;
+}
+
 QString ProjectHistory::getSavePath()
 {
     return QDir::homePath() + PROJ_PATH_ROOT + "/" + HISTORY_FILE_PATH;

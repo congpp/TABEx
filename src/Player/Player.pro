@@ -32,7 +32,8 @@ SOURCES += \
     qtimerex.cpp \
     painthandler.cpp \
     resourceloader.cpp \
-    welcomedialog.cpp
+    welcomedialog.cpp \
+    qhistorytabledelegate.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -43,7 +44,8 @@ HEADERS += \
     qtimerex.h \
     painthandler.h \
     resourceloader.h \
-    welcomedialog.h
+    welcomedialog.h \
+    qhistorytabledelegate.h
 
 FORMS += \
         mainwindow.ui \

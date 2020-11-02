@@ -7,6 +7,7 @@ QFileUtil::QFileUtil()
 
 QString QFileUtil::getFileName(QString strFullName)
 {
+    strFullName.replace('\\', '/');
     int idx = strFullName.lastIndexOf('/');
     if (idx < 0)
         return strFullName;
@@ -16,6 +17,7 @@ QString QFileUtil::getFileName(QString strFullName)
 
 QString QFileUtil::getFilePath(QString strFullName)
 {
+    strFullName.replace('\\', '/');
     int idx = strFullName.lastIndexOf('/');
     if (idx < 0)
         return strFullName;

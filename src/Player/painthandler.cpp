@@ -464,9 +464,9 @@ void QVerticalPaintHandler::paintInfo(QPainter *painter, QRect rc)
     rcR.setLeft(rc.left()+rc.width()/2 + textPadding);
     rcR.setHeight(infoHeight);
 
-    QFont f1("", 16); f1.setBold(true);
-    QFont f2("", 26); f2.setBold(true);
-    QPen pen(QColor(0xFF,0xFF,0xFF));
+    static const QFont f1("", 16, QFont::Bold);
+    static const QFont f2("", 26, QFont::Bold);
+    static const QPen pen(QColor(0xFF,0xFF,0xFF));
     QString str;
 
     struct InfoMap

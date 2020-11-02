@@ -15,12 +15,15 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    bool openProject(QString strProj);
 
 protected:
     void initUI();
 
     virtual void wheelEvent(QWheelEvent *event) override;
+
+public slots:
+    bool openProject(QString strProj);
+
 private slots:
     void on_actionOpen_triggered();
     void on_btnPlay_clicked(bool checked);

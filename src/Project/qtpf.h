@@ -50,6 +50,7 @@ public:
 
     bool releaseToDir(QString dirPath);
 
+    static QImagePtr loadCoverImage(QString tpf);
 protected:
     bool releaseFile(QString dirPath, TPFHeader tpfh);
     bool releaseImage(QString dirPath, TPFHeader tpfh);

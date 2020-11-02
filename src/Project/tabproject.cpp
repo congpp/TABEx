@@ -818,6 +818,11 @@ QAbstractItemModel *TABProject::getPreviewImageModel()
     return &m_prevImgModel;
 }
 
+QAbstractTableModel *TABProject::getHistoryModel()
+{
+    return static_cast<QAbstractTableModel*>(&m_history);
+}
+
 void TABProject::notifyModelChanged()
 {
     m_tlModel.notifyChanged(0, getTabLineCount());
@@ -874,6 +879,9 @@ QString TABProject::getTempPath(bool bCreate)
     QString strPath = QDir::homePath() + PROJ_PATH_ROOT;
     if (bCreate)
         m_uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+    if (m_uuid.isEmpty())
+        return "";
 
     strPath.append(m_uuid);
     strPath.append("/");

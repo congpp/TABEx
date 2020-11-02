@@ -2,6 +2,7 @@
 #define PROJECTHISTORY_H
 #include <QString>
 #include <QList>
+#include <QAbstractTableModel>
 
 struct ProjectHistoryInfo
 {
@@ -13,11 +14,11 @@ struct ProjectHistoryInfo
 
 typedef QList<ProjectHistoryInfo> ProjectHisotryInfoList;
 
-class ProjectHistory
+class ProjectHistory  : public QAbstractTableModel
 {
 public:
     ProjectHistory();
-    ~ProjectHistory();
+    ~ProjectHistory() override;
 
     bool add(QString projFile, QString uuid, int adjustedBeat);
 
@@ -27,6 +28,17 @@ public:
     ProjectHisotryInfoList getHistrory();
 
     bool getProjectHistory(QString projFile, ProjectHistoryInfo &hist);
+
+    void notifyChanged(int index, int count=1);
+
+public:
+    int rowCount(const QModelIndex &parent) const override;
+
+    int columnCount(const QModelIndex &parent) const override;
+
+    QVariant data(const QModelIndex &index, int role) const override;
+
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 protected:
     QString getSavePath();
 
