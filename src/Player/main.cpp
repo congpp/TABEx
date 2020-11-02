@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "resourceloader.h"
 #include "welcomedialog.h"
 #include <QApplication>
@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
     g_resLoader.loadImages();
 
     MainWindow w;
-    WelcomeDialog* pDlg = nullptr;
     QString projFile;
     if (argc > 1)
     {
@@ -23,9 +22,18 @@ int main(int argc, char *argv[])
     }
     else
     {
-        pDlg = new WelcomeDialog;
-        pDlg->show();
-        w.connect(pDlg, &WelcomeDialog::signalOpenProject, &w, &MainWindow::openProject);
+        WelcomeDialog dlg;
+        dlg.exec();
+        projFile = dlg.getSelectedProjFile();
+        if (!projFile.isEmpty())
+        {
+            w.show();
+            w.openProject(projFile);
+        }
+        else
+        {
+            exit(0);
+        }
     }
 
     int ret = a.exec();
@@ -37,6 +45,5 @@ int main(int argc, char *argv[])
             QFile::remove(projFile);
     }
 
-    if (pDlg) delete pDlg;
     return ret;
 }

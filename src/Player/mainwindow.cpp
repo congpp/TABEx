@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "../Project/tabproject.h"
 #include "resourceloader.h"
+#include "welcomedialog.h"
 #include <QtWidgets>
 #include <QDebug>
 
@@ -56,8 +57,14 @@ bool MainWindow::openProject(QString strProj)
     if (TAB_INST->openProject(strProj))
     {
         initUI();
-        show();
         return true;
+    }
+    else
+    {
+        QMessageBox box(this);
+        box.setIcon(QMessageBox::Critical);
+        box.setText(tr("Cannot open project!"));
+        box.exec();
     }
 
     return false;

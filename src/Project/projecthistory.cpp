@@ -1,4 +1,4 @@
-#include "projecthistory.h"
+﻿#include "projecthistory.h"
 #include "commondefine.h"
 #include <QDir>
 #include <QJsonDocument>
@@ -9,6 +9,7 @@
 #include <QDateTime>
 
 const QString HISTORY_FILE_PATH("history.json");
+const int MAX_HISTROY_SIZE = 100;
 
 ProjectHistory::ProjectHistory()
 {
@@ -38,7 +39,7 @@ bool ProjectHistory::add(QString projFile, QString uuid, int adjustedBeat)
     hi.adjustedBeat = adjustedBeat;
     m_history.push_front(hi);
 
-    while (m_history.size() > 10)
+    while (m_history.size() > MAX_HISTROY_SIZE)
         m_history.removeLast();
 
     return true;
@@ -94,10 +95,16 @@ bool ProjectHistory::open()
         ProjectHistoryInfo hi;
         QJsonObject obj = it.toObject();
         hi.filePath = obj.take("filePath").toString();
+        if (!QFile::exists(hi.filePath))
+            continue;
+
         hi.uuid = obj.take("uuid").toString();
         hi.timeAccess = obj.take("timeAccess").toString();
         hi.adjustedBeat = obj.take("adjustedBeat").toInt();
         m_history.push_back(hi);
+
+        if (m_history.size() > MAX_HISTROY_SIZE)
+            break;
     }
 
     return true;

@@ -1,4 +1,4 @@
-#ifndef WELCOMEDIALOG_H
+﻿#ifndef WELCOMEDIALOG_H
 #define WELCOMEDIALOG_H
 
 #include <QDialog>
@@ -23,11 +23,11 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
 
-signals:
-    void signalOpenProject(QString strProjFile);
 private slots:
     void on_pushButtonOpen_clicked();
     void slotOnTableClicked(const QModelIndex &idx);
+
+    void on_pushButtonCancel_clicked();
 
 private:
     Ui::WelcomeDialog *ui;

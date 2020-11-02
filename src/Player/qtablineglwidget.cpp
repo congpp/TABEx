@@ -126,11 +126,13 @@ int QTabLineGLWidget::getPlayingTabLine()
 
 bool QTabLineGLWidget::playNext(int iVal)
 {
+    m_iTimeCurrent = 0;
     return setPlayingTabLine(m_iTabLine+iVal, true);
 }
 
 bool QTabLineGLWidget::playPrev(int iVal)
 {
+    m_iTimeCurrent = 0;
     return setPlayingTabLine(m_iTabLine-iVal, true);
 }
 

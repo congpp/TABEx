@@ -1,4 +1,4 @@
-#include "welcomedialog.h"
+﻿#include "welcomedialog.h"
 #include "ui_welcomedialog.h"
 #include "qhistorytabledelegate.h"
 #include "../Project/tabproject.h"
@@ -78,7 +78,6 @@ void WelcomeDialog::on_pushButtonOpen_clicked()
         return;
 
     m_strProjFile = strProj;
-    emit signalOpenProject(m_strProjFile);
     close();
 }
 
@@ -89,7 +88,11 @@ void WelcomeDialog::slotOnTableClicked(const QModelIndex &idx)
     if (sl.size() == 2)
     {
         m_strProjFile = sl.at(0);
-        emit signalOpenProject(m_strProjFile);
         close();
     }
+}
+
+void WelcomeDialog::on_pushButtonCancel_clicked()
+{
+    close();
 }

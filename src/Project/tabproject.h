@@ -145,6 +145,8 @@ private:
     ProjectHistory  m_history;
 
     int m_adjustedBeat = 0; //用来暂时调速
+
+    bool m_bIsPreviewProject = false;   //只是用来预览的工程
 };
 
 #define TAB_INST TABProject::getInstance()

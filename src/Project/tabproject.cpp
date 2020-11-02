@@ -86,7 +86,8 @@ bool TABProject::openProject(QString strProjFile)
     if (m_history.getProjectHistory(m_projFile, hi))
         m_adjustedBeat = hi.adjustedBeat;
 
-    m_history.add(m_projFile, m_uuid, m_adjustedBeat);
+    if (!m_bIsPreviewProject)
+        m_history.add(m_projFile, m_uuid, m_adjustedBeat);
     return true;
 }
 
@@ -119,6 +120,7 @@ bool TABProject::openJson(QString strJsonFile)
     m_projInfo.strSingerName = jsRoot["SingerName"].toString();
     m_projInfo.beatPerMinute = jsRoot["BeatPerMinute"].toInt();
     m_projInfo.beatPerSection = jsRoot["BeatPerSection"].toInt();
+    m_bIsPreviewProject = jsRoot["Preview"].toBool();
 
     QJsonArray jsImgs = jsRoot["imgs"].toArray();
     for (auto it : jsImgs)
@@ -155,6 +157,7 @@ bool TABProject::saveProject(QString strProjFile, bool bTemp)
     jsRoot.insert("SingerName", m_projInfo.strSingerName);
     jsRoot.insert("BeatPerMinute", m_projInfo.beatPerMinute);
     jsRoot.insert("BeatPerSection", m_projInfo.beatPerSection);
+    jsRoot.insert("Preview", bTemp);
 
     QJsonArray jsImgs;
     for (auto it : m_projInfo.imgList)
@@ -202,7 +205,7 @@ bool TABProject::saveProject(QString strProjFile, bool bTemp)
 
 bool TABProject::closeProject()
 {
-    if(!m_projFile.isEmpty())
+    if(!m_projFile.isEmpty() && !m_bIsPreviewProject)
         m_history.add(m_projFile, m_uuid, m_adjustedBeat);
 
     TabProjInfo pi = {};

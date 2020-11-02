@@ -68,6 +68,9 @@ void IPaintHandler::setTabLineIndex(int idx)
         m_smoothScroll = 1;
     else
         m_iTabLine = idx;
+
+    //重置进度
+    m_maskPercent = 0;
 }
 
 void IPaintHandler::setTabLineMaskPercent(double percent)
@@ -401,6 +404,7 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
         drawRoundImage(painter, rcL, img, l->rcPos);
         //painter->fillRect(rcL, brFg);
         rcL.setBottom(rcL.top()-padding);
+        rcL.setWidth(rcTabLine.width());
     }
 
     //bottom
@@ -418,6 +422,7 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
 
         drawRoundImage(painter, rcR, img, r->rcPos);
         rcR.setTop(rcR.bottom());
+        rcR.setWidth(rcTabLine.width());
     }
 
     painter->setOpacity(1.0);

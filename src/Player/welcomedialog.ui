@@ -18,13 +18,41 @@
 {
    background-image: url(:/image/resource/image/welcome.png);
 }
-*{font: 9pt &quot;微软雅黑&quot;;}</string>
+*{
+font: 9pt &quot;微软雅黑&quot;;
+	color: rgb(255, 255, 255);
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
    <item>
     <widget class="QLabel" name="label">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="text">
       <string>Recent project(s)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>1</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>400</width>
+       <height>1</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,stop: 0 #4a4b4e, stop: 1 #66664a);</string>
      </property>
     </widget>
    </item>
@@ -91,6 +119,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -106,8 +137,21 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonOpen">
+       <property name="minimumSize">
+        <size>
+         <width>64</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>32</height>
+        </size>
+       </property>
        <property name="styleSheet">
         <string notr="true">QPushButton {
+  border: none; /* make the default button prominent */
   background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #26272a, stop: 1 #4a4b4e);
 }
 QPushButton:hover {
@@ -125,6 +169,43 @@ QPushButton:default {
        </property>
        <property name="text">
         <string>Open...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonCancel">
+       <property name="minimumSize">
+        <size>
+         <width>64</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+  border: none; 
+  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #26272a, stop: 1 #4a4b4e);
+}
+QPushButton:hover {
+  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #36373a, stop: 1 #5a5b5e);
+}
+QPushButton:pressed {
+  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #26272a, stop: 1 #4a4b4e);
+}
+QPushButton:flat {
+  border: none; 
+}
+QPushButton:default {
+  border: none; 
+}</string>
+       </property>
+       <property name="text">
+        <string>Cancel</string>
        </property>
       </widget>
      </item>
