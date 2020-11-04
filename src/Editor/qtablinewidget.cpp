@@ -1,4 +1,4 @@
-#include "qtablinewidget.h"
+﻿#include "qtablinewidget.h"
 #include "qtablineconfigdialog.h"
 #include "qtablineitem.h"
 #include "qtablineitemlistdelegate.h"

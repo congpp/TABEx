@@ -13,29 +13,28 @@ int main(int argc, char *argv[])
     g_resLoader.loadImages();
 
     MainWindow w;
-    w.show();
     QString projFile;
-    //if (argc > 1)
-    //{
-    //    projFile = QString::fromLocal8Bit(argv[1]);
-    //    w.show();
-    //    w.openProject(projFile);
-    //}
-    //else
-    //{
-    //    WelcomeDialog dlg;
-    //    dlg.exec();
-    //    projFile = dlg.getSelectedProjFile();
-    //    if (!projFile.isEmpty())
-    //    {
-    //        w.show();
-    //        w.openProject(projFile);
-    //    }
-    //    else
-    //    {
-    //        exit(0);
-    //    }
-    //}
+    if (argc > 1)
+    {
+        projFile = QString::fromLocal8Bit(argv[1]);
+        w.show();
+        w.openProject(projFile);
+    }
+    else
+    {
+        WelcomeDialog dlg;
+        dlg.exec();
+        projFile = dlg.getSelectedProjFile();
+        if (!projFile.isEmpty())
+        {
+            w.show();
+            w.openProject(projFile);
+        }
+        else
+        {
+            exit(0);
+        }
+    }
 
     int ret = a.exec();
 

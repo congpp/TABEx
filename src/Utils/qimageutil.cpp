@@ -1,4 +1,4 @@
-#include "qimageutil.h"
+﻿#include "qimageutil.h"
 #include <queue>
 /////////////////////////////////////////////////////////////////////////////////
 QImageBitTool::QImageBitTool()
@@ -88,7 +88,7 @@ bool QImageUtil::getCenterPaintingRect(const QSize &szImg, const QRect &rcPaint,
     QRect rcWin = rcPaint;
     int wWin = rcWin.width(), hWin = rcWin.height();
     int wImg = szImg.width(), hImg = szImg.height();
-    int l=0, t=0, w=szImg.width(), h=szImg.height();
+    int l=0, t=0, w=wImg, h=hImg;
     QRect rcImg(0, 0, wImg, hImg);
 
     //包含, 居中即可
@@ -101,8 +101,8 @@ bool QImageUtil::getCenterPaintingRect(const QSize &szImg, const QRect &rcPaint,
         }
         else
         {
-            l=0;
-            t=0;
+            l=rcWin.left();
+            t=rcWin.top();
             h=int(hImg*(wWin/w));
             w=wWin;
         }
@@ -115,15 +115,15 @@ bool QImageUtil::getCenterPaintingRect(const QSize &szImg, const QRect &rcPaint,
         w = int(wImg / fH);
 
         //太宽了，再缩小宽度
-        if (wImg > wWin)
+        if (w > wWin)
         {
             double fW = wImg * 1.0 / wWin;
             w = wWin;
             h = int(hImg / fW);
         }
 
-        l = (wWin - wImg) / 2 + rcWin.left();
-        t = (hWin - hImg) / 2 + rcWin.top();
+        l = (wWin - w) / 2 + rcWin.left();
+        t = (hWin - h) / 2 + rcWin.top();
     }
 
     rcCenter = QRect(l, t, w, h);

@@ -124,10 +124,10 @@ void IPaintHandler::paintCover(QPainter *painter, QRect rc)
         pcd.begin(&cd);
         pcd.setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform);
         QPainterPath pp1, pp2;
-        pp1.addEllipse(QPoint(160,160),130,130);
-        pp2.addEllipse(QPoint(160,160),40,40);
-        pcd.setClipPath(pp1.subtracted(pp2));
-        pcd.setOpacity(0.8);
+        pp1.addEllipse(QPointF(160.5,160.5),114,114);
+        //pp2.addEllipse(QPoint(160,160),40,40);
+        pcd.setClipPath(pp1);
+        //pcd.setOpacity(0.8);
         if (!imgCover.isNull())
         {
             pcd.drawImage(cd.rect(), *imgCover);
