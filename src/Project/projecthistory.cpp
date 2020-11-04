@@ -95,8 +95,8 @@ bool ProjectHistory::open()
         ProjectHistoryInfo hi;
         QJsonObject obj = it.toObject();
         hi.filePath = obj.take("filePath").toString();
-        if (!QFile::exists(hi.filePath))
-            continue;
+        //if (!QFile::exists(hi.filePath))
+        //    continue;
 
         hi.uuid = obj.take("uuid").toString();
         hi.timeAccess = obj.take("timeAccess").toString();
@@ -127,6 +127,18 @@ bool ProjectHistory::getProjectHistory(QString projFile, ProjectHistoryInfo& his
     }
 
     return false;
+}
+
+bool ProjectHistory::removeRows(int row, int count, const QModelIndex &parent)
+{
+    int index = row * columnCount(parent) + count;
+    if (index < m_history.size())
+    {
+        m_history.erase(m_history.begin() + index);
+        QModelIndex idx = createIndex(row, count);
+        emit dataChanged(idx, idx);
+    }
+    return true;
 }
 
 int ProjectHistory::rowCount(const QModelIndex &parent) const

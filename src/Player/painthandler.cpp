@@ -52,9 +52,17 @@ void IPaintHandler::setTabLineSize(QSize szTL)
     m_szTabLineImg = szTL;
 }
 
-void IPaintHandler::setBackgroundImage(QImagePtr img)
+void IPaintHandler::setBackgroundImage(QImagePtr img, QColor clr)
 {
     m_imgBg = img;
+
+    //背景色不能太亮
+    qreal h, s, l;
+    clr.getHslF(&h, &s, &l);
+    if (l > 0.3)
+        l = 0.3;
+    clr.setHslF(h, s, l);
+    m_clrBg = clr;
 }
 
 void IPaintHandler::setTabLineIndex(int idx)
@@ -119,7 +127,7 @@ void IPaintHandler::paintCover(QPainter *painter, QRect rc)
         pp1.addEllipse(QPoint(160,160),130,130);
         pp2.addEllipse(QPoint(160,160),40,40);
         pcd.setClipPath(pp1.subtracted(pp2));
-        pcd.setOpacity(0.5);
+        pcd.setOpacity(0.8);
         if (!imgCover.isNull())
         {
             pcd.drawImage(cd.rect(), *imgCover);
@@ -322,11 +330,12 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
 {
     if (!m_imgBg.isNull())
     {
-        //TODO 模仿云音乐，让bg不失真
-        //int w=rc.width();
-        //QRect rcImg(rc);
-        //rcImg.setHeight(w);
-        painter->drawImage(rc, *m_imgBg);
+        painter->fillRect(rc, m_clrBg);
+        //painter->drawImage(rc, *m_imgBg);
+        QRect rcBg;
+        QImageUtil::getCenterPaintingRect(m_imgBg->size(), rc, rcBg, true);
+        rcBg.moveTop(rc.top());
+        painter->drawImage(rcBg, *m_imgBg);
     }
 
     TABProject* pProj = TAB_INST;

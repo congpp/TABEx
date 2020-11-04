@@ -33,7 +33,7 @@ public:
     virtual void setPlayStatus(PlayStatus* ps);
 
     virtual void setTabLineSize(QSize szTL);
-    virtual void setBackgroundImage(QImagePtr img);
+    virtual void setBackgroundImage(QImagePtr img, QColor clr);
     virtual void setTabLineIndex(int idx);
     virtual void setTabLineMaskPercent(double percent);
 
@@ -45,6 +45,7 @@ protected:
     virtual void paintInfo(QPainter* painter, QRect rc);
 protected:
     QImagePtr m_imgBg;
+    QColor    m_clrBg;
     QImagePtr m_imgCover;
     QImagePtr m_imgSinger;
 

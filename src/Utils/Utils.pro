@@ -25,13 +25,15 @@ SOURCES += \
         utils.cpp \
     qfileutil.cpp \
     qstringutil.cpp \
-    qimageutil.cpp
+    qimageutil.cpp \
+    qpainterutil.cpp
 
 HEADERS += \
         utils.h \
     qfileutil.h \
     qstringutil.h \
-    qimageutil.h
+    qimageutil.h \
+    qpainterutil.h
 
 unix {
     target.path = /usr/lib

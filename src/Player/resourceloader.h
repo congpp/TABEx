@@ -11,6 +11,8 @@ enum ResourceID
     RID_IMG_CD,
     RID_IMG_COVER,
     RID_IMG_TRIANGLE,
+    RID_IMG_WELCOME_BG,
+    RID_IMG_WELCOME2_BG,
 };
 
 class ResourceLoader

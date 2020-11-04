@@ -20,6 +20,7 @@ protected:
     void initUI();
 
     virtual void wheelEvent(QWheelEvent *event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 public slots:
     bool openProject(QString strProj);

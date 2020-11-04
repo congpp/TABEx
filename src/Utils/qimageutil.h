@@ -27,49 +27,12 @@ class QImageUtil
 {
 public:
     QImageUtil();
-
-    static bool getCenterPaintingRect(const QSize& szImg, const QRect& rcPaint, QRect& rcCenter)
-    {
-        if (szImg.isNull() || rcPaint.isNull())
-            return false;
-
-
-        QRect rcWin = rcPaint;
-
-        //const QRect rcWin(rc.left + m_rcCenterPadding.left, rc.top + m_rcCenterPadding.top,
-        //    (REAL)rc.GetWidth() - m_rcCenterPadding.right - m_rcCenterPadding.left,
-        //    (REAL)rc.GetHeight() - m_rcCenterPadding.bottom - m_rcCenterPadding.top);
-
-        QRect rcImg(0, 0, szImg.width(), szImg.height());
-
-        //包含, 居中即可
-        if (rcWin.width() > rcImg.width() && rcWin.height() > rcImg.height())
-        {
-            rcImg.moveLeft((rcWin.width() - rcImg.width()) / 2 + rcWin.left());
-            rcImg.moveTop((rcWin.height() - rcImg.height()) / 2 + rcWin.top());
-        }
-        else
-        {
-            //按高度缩小
-            double fH = rcImg.height() * 1.0 / rcWin.height();
-            rcImg.setHeight(rcWin.height());
-            rcImg.setWidth(int(rcImg.width() / fH));
-
-            //太宽了，再缩小宽度
-            if (rcImg.width() > rcWin.width())
-            {
-                double fW = rcImg.width() * 1.0 / rcWin.width();
-                rcImg.setWidth(rcWin.width());
-                rcImg.setHeight(int(rcImg.height() / fW));
-            }
-
-            rcImg.moveLeft((rcWin.width() - rcImg.width()) / 2 + rcWin.left());
-            rcImg.moveTop((rcWin.height() - rcImg.height()) / 2 + rcWin.top());
-        }
-
-        rcCenter = rcImg;
-        return true;
-    }
+    //获取图片居中等比绘制在rcPaint里面的相对区域rcCenter
+    static bool getCenterPaintingRect(const QSize& szImg, const QRect& rcPaint, QRect& rcCenter, bool bZoomIn=false);
+    //获取图片出现最多的颜色
+    static QColor getMajorColorOfImage(QImage &img);
+    //构建中心到边沿逐渐透明的图片
+    static QImage* getEdgeTransparentImage(QImage &img, QPoint ptCenter=QPoint());
 };
 
 #endif // QIMAGEUTIL_H

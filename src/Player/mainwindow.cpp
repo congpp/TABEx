@@ -160,3 +160,24 @@ void MainWindow::on_actionExit_triggered()
 {
     QApplication::exit(0);
 }
+
+
+void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        static Qt::WindowStates wsOld = Qt::WindowNoState;
+        Qt::WindowStates ws = windowState();
+        if (ws == Qt::WindowFullScreen)
+        {
+            ws = wsOld;
+        }
+        else
+        {
+            wsOld = ws;
+            ws = Qt::WindowFullScreen;
+        }
+
+        setWindowState(ws);
+    }
+}

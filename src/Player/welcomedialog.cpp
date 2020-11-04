@@ -87,8 +87,23 @@ void WelcomeDialog::slotOnTableClicked(const QModelIndex &idx)
     QStringList sl = var.toStringList();
     if (sl.size() == 2)
     {
-        m_strProjFile = sl.at(0);
-        close();
+        if (!QFile::exists(sl.at(0)))
+        {
+            QMessageBox msg(QMessageBox::Information,
+                            tr("File not found"),
+                            QString(tr("File not found:\r\n")) + sl.at(0) + QString(tr("\r\nRemove from recent list?")),
+                            QMessageBox::Ok|QMessageBox::No);
+            int ret = msg.exec();
+            if (QMessageBox::Ok == ret)
+            {
+                TAB_INST->getHistoryModel()->removeRows(idx.row(), idx.column());
+            }
+        }
+        else
+        {
+            m_strProjFile = sl.at(0);
+            close();
+        }
     }
 }
 

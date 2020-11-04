@@ -43,7 +43,7 @@ public:
     QImagePtr m_imgCoverBlur;  //blur the cover using gaussian blur
     //QImage m_imgTabLine;    //draw all tab line in to this image
     //uchar* m_pixels = nullptr;
-
+    QColor m_clrCoverMajor;
     TabLineStatus m_tlStatus = TLS_UNKNOWN;
 };
 

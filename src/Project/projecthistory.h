@@ -31,6 +31,9 @@ public:
 
     void notifyChanged(int index, int count=1);
 
+    //重写了，因为只删除一个，所以count指的是column()
+    virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+
 public:
     int rowCount(const QModelIndex &parent) const override;
 

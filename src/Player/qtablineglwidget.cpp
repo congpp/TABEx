@@ -1,11 +1,9 @@
 ﻿#include "qtablineglwidget.h"
-#include "../Project/tabproject.h"
+#include "resourceloader.h"
 #include "gaussianBlur.h"
+#include "../Project/tabproject.h"
 #include "../Utils/utils.h"
 #include <QtWidgets>
-
-const QSize szLoading(60,60);
-const QSize szCover(200, 200);
 
 QTabLineGLWidget::QTabLineGLWidget(QWidget *parent)
     //: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -202,6 +200,8 @@ void QTabLineGLWidget::slotOnThreadFinished()
 void QTabLineGLWidget::paintEvent(QPaintEvent *event)
 {
     //QGLWidget::paintEvent(event);
+    static const QSize szLoading(60,60);
+    static const QSize szCover(200, 200);
 
     Q_UNUSED(event);
     QPainter painter;
@@ -229,14 +229,19 @@ void QTabLineGLWidget::paintEvent(QPaintEvent *event)
     case TLS_BG_LOADED:
     case TLS_TABLINE_LOADING:
     {
-        static const QBrush br(QColor(0xFF,0xFF,0xFF));
-        painter.fillRect(rc, br);
+        QImagePtr img = g_resLoader.getImage(RID_IMG_WELCOME2_BG);
+        QRect rcCenter;
+        QImageUtil::getCenterPaintingRect(img->size(), rc, rcCenter);
+        rcCenter.moveTop(rc.top());
+        QColor clr(76, 81, 82);
+        painter.fillRect(rc, clr);
+        painter.drawImage(rcCenter, *img, img->rect());
         break;
     }
     case TLS_TABLINE_LOADED:
     case TLS_DONE:
     {
-        m_paintHandler->setBackgroundImage(m_thread.m_imgCoverBlur);
+        m_paintHandler->setBackgroundImage(m_thread.m_imgCoverBlur, m_thread.m_clrCoverMajor);
         m_paintHandler->setTabLineMaskPercent(m_iTimeTotal==0 ? 0 : m_iTimeCurrent*1.0/m_iTimeTotal);
         m_paintHandler->onPaint(&painter, rc);
 
@@ -319,44 +324,25 @@ void QTabLineThread::run()
     QImage imgScreen = m_imgCoverBlur->copy();
 
     QImageBitTool bitScreen;
-    uchar* pSrc = bitScreen.lockBits32Bpp(imgScreen);
+    uchar* pSrc = bitScreen.lockBits32Bpp(*m_imgCoverBlur);
     size_t byteCount = bitScreen.getPixelSize();
     uchar *pDst = new uchar[byteCount];
     filter.Filter(pSrc, pDst, imgScreen.width(), imgScreen.height(), 32);
-    filter.Filter(pSrc, pDst, imgScreen.width(), imgScreen.height(), 32);
+    //filter.Filter(pSrc, pDst, imgScreen.width(), imgScreen.height(), 32);
 
     bitScreen.unlockBits32Bpp(imgScreen, pDst, byteCount);
 
     delete [] pDst;
 
-    *m_imgCoverBlur = imgScreen;
+    QPoint pt(imgScreen.width()/2, 0);
+    m_imgCoverBlur.reset(QImageUtil::getEdgeTransparentImage(imgScreen, pt));
     //m_imgCoverBlur.save("d:/dst.png", "PNG");
+    m_clrCoverMajor = QImageUtil::getMajorColorOfImage(imgScreen);
+
+    qDebug() << m_clrCoverMajor;
+
     m_tlStatus = TLS_BG_LOADED;
 
-    m_tlStatus = TLS_TABLINE_LOADING;
-    //auto tls = TAB_INST->getTabLineList();
-    //int w=0, h=0;
-    //for (auto tl : tls)
-    //{
-    //    h = std::max(h, tl->rcPos.height()+tl->rcOffset.top());
-    //    w += tl->rcPos.width();
-    //}
-    //
-    //QImage imgTL(w, h, QImage::Format_ARGB32_Premultiplied);
-    //QPainter p;
-    //p.begin(&imgTL);
-    //QRect rc(0, 0, 0, h);
-    //for (auto tl : tls)
-    //{
-    //    QImagePtr pImg = TAB_INST->getImage(tl->strImg);
-    //    rc.setLeft(rc.right() + 5);
-    //    rc.setWidth(tl->rcPos.width());
-    //    p.drawImage(rc, *pImg, tl->rcPos);
-    //}
-    //p.end();
-    //m_imgTabLine = imgTL;
-
-    m_tlStatus = TLS_TABLINE_LOADED;
     m_tlStatus = TLS_DONE;
 }
 

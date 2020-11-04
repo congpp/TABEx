@@ -25,6 +25,12 @@ void ResourceLoader::loadImages()
     ptrImg.reset(new QImage(":/image/resource/image/triangle.png"));
     m_imgs[RID_IMG_TRIANGLE] = ptrImg;
 
+    ptrImg.reset(new QImage(":/image/resource/image/welcome.png"));
+    m_imgs[RID_IMG_WELCOME_BG] = ptrImg;
+
+    ptrImg.reset(new QImage(":/image/resource/image/welcome2.png"));
+    m_imgs[RID_IMG_WELCOME2_BG] = ptrImg;
+
 }
 
 void ResourceLoader::registerExternalImage(QString key, QImagePtr img)

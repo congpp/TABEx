@@ -49,7 +49,7 @@ void QHistoryTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     static const QBrush brBGHover(QColor(127,200,255,64));
     static const QPen   penHover(QColor(127,200,255,128));
     static const QPen   penTitle(QColor(0xEE,0xEE,0xEE,0xFF)), penInfo(QColor(0xCD,0xCD,0xCD,0xFF));
-    static const QFont  fontTitle("微软雅黑", 14), fontInfo("微软雅黑", 11);
+    static const QFont  fontTitle("微软雅黑", 13), fontInfo("微软雅黑", 10);
 
     //bg
     painter->fillRect(rc, brBG);
@@ -71,8 +71,8 @@ void QHistoryTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     if (img)
         painter->drawImage(rcCover, *img, img->rect());
 
-    QRect rcName(l + 84, t + 4, w - 84, 25);
-    QRect rcPath(l + 84, t + 30, w - 84, 18);
+    QRect rcName(l + 84, t + 4, w - 84, 24);
+    QRect rcPath(l + 84, t + 28, w - 84, 18);
     QRect rcDate(l + 84, t + 48, w - 84, 18);
 
     painter->setPen(penTitle);

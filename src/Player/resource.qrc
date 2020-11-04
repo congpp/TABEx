@@ -6,5 +6,6 @@
         <file>resource/image/triangle.png</file>
         <file>resource/image/user.png</file>
         <file>resource/image/welcome.png</file>
+        <file>resource/image/welcome2.png</file>
     </qresource>
 </RCC>
