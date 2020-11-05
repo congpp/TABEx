@@ -591,6 +591,25 @@ QSize TABProject::getTabLineSizeV(int padding)
     return QSize(w, h);
 }
 
+QSize TABProject::getTabLineFixedSizeV()
+{
+    int w=0, h=INT_MAX;
+    for (auto tl : m_projInfo.tabLines)
+    {
+        int w1 = tl->rcPos.width();
+        if (w1 > w)
+        {
+            w = w1;
+            h = std::min(h, tl->rcPos.height());
+        }
+    }
+
+    if (h == INT_MAX)
+        h = 0;
+
+    return QSize(w, h);
+}
+
 TabLinePtr TABProject::findTabLineByTime(double t)
 {
     //一个小节的时间

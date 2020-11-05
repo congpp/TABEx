@@ -72,9 +72,12 @@ bool MainWindow::openProject(QString strProj)
 
 void MainWindow::on_actionOpen_triggered()
 {
-    QString strProj = QFileDialog::getOpenFileName(this,
-        tr("Open Project"), QDir::currentPath(), tr("Tab Project Files (*.tpf)"));
+    //QString strProj = QFileDialog::getOpenFileName(this,
+    //    tr("Open Project"), QDir::currentPath(), tr("Tab Project Files (*.tpf)"));
+    WelcomeDialog dlg(this);
+    dlg.exec();
 
+    QString strProj = dlg.getSelectedProjFile();
     if (strProj.isEmpty())
         return;
 

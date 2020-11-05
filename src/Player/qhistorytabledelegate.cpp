@@ -26,7 +26,7 @@ void QHistoryTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     QImagePtr img = g_resLoader.findExternalImage(fileName);
     if (!img)
     {
-        img = QTPF::loadCoverImage(fileName);
+        img = QTPF::getProjectCoverImage(fileName);
         if (img)
             g_resLoader.registerExternalImage(fileName, img);
         else

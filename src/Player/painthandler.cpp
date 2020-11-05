@@ -38,7 +38,10 @@ void IPaintHandler::setPlayStatus(PlayStatus *ps)
     switch (*m_ps) {
     case PS_IDLE:
     case PS_PAUSED:
+        m_fps.stop();
+        break;
     case PS_FINISHED:
+        m_maskPercent=0;
         m_fps.stop();
         break;
     case PS_PLAYING:
@@ -303,6 +306,16 @@ void QHorizontalPaintHandler::init()
     m_szTabLineImg = TAB_INST->getTabLineSizeH();
 }
 
+void QHorizontalPaintHandler::calculateFixedItemRect(QRect rc)
+{
+    Q_UNUSED(rc);
+    if (rc == m_rcLastPaint)
+        return;
+
+    QSize sz = TAB_INST->getTabLineSizeH(0);
+    m_szFixedTabItem.setHeight(sz.height());
+}
+
 ///////////////////////////////////////////////////////////////////////////
 /// \brief QVerticalPaintHandler::QVerticalPaintHandler
 ///
@@ -338,18 +351,20 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
         painter->drawImage(rcBg, *m_imgBg);
     }
 
+    calculateFixedItemRect(rc);
+
     TABProject* pProj = TAB_INST;
 
     //cover
-    QRect rcCover;
-    rcCover.setTop(rc.top() + rc.height() / 3 - m_szCoverMax.height() / 2);
-    rcCover.setRight(rc.left() + int(rc.width() * m_tabLineXPos));
-    rcCover.setLeft(rcCover.right() - m_szCoverMax.width());
-    rcCover.setBottom(rcCover.top() + m_szCoverMax.height());
+    QRect rcCover(m_rcCover);
+    //rcCover.setTop(rc.top() + rc.height() / 3 - m_szCoverMax.height() / 2);
+    //rcCover.setRight(rc.left() + int(rc.width() * m_tabLineXPos));
+    //rcCover.setLeft(rcCover.right() - m_szCoverMax.width());
+    //rcCover.setBottom(rcCover.top() + m_szCoverMax.height());
     paintCover(painter, rcCover);
 
     //info
-    QRect rcInfo = rcCover;
+    QRect rcInfo(rcCover);
     rcInfo.adjust(0, m_szCoverMax.height(), 0, 0);
     paintInfo(painter, rcInfo);
 
@@ -358,9 +373,9 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
 
     //封面右边，整块区域，20px padding
     const int padding = 20;
-    QRect rcTabLine(rcCover.right() + padding, rc.top() + padding, 0, 0);
-    rcTabLine.setRight(rc.right() - padding);
-    rcTabLine.setBottom(rc.bottom() - padding);
+    QRect rcTabLine=m_rcTabLine;//(rcCover.right() + padding, rc.top() + padding, 0, 0);
+    //rcTabLine.setRight(rc.right() - padding);
+    //rcTabLine.setBottom(rc.bottom() - padding);
 
     //bg
     //painter->fillRect(rcTabLine, brBg);
@@ -464,6 +479,10 @@ void QVerticalPaintHandler::paintInfo(QPainter *painter, QRect rc)
     if (tl.isNull())
         return;
 
+    double percent = m_maskPercent;
+    if (m_ps && *m_ps == PS_FINISHED)
+        percent = 1.0;
+
     painter->save();
     painter->setRenderHint(QPainter::TextAntialiasing);
     //cover下面区域切成左右两边
@@ -492,7 +511,7 @@ void QVerticalPaintHandler::paintInfo(QPainter *painter, QRect rc)
         {tr("Song Time:"), QStringUtil::double2MMSS(proj->getSecondOfThisSong())},
         {tr("Speed:"), QString::asprintf("%d", proj->getBeatPerMinuteAdjusted())},
         {tr("Sections:"), QString::asprintf("%d", tl->sections)},
-        {tr("Time:"), QString::asprintf("%.2f", proj->getSecondAtTabLine(m_iTabLine)*(1-m_maskPercent))},
+        {tr("Time:"), QString::asprintf("%.2f", proj->getSecondAtTabLine(m_iTabLine)*(1-percent))},
     };
 
     for (auto im : ims)
@@ -518,6 +537,10 @@ void QVerticalPaintHandler::paintProgress(QPainter *painter, QRect rc)
     if (m_maskPercent < 0.01)
         return;
 
+    double percent = m_maskPercent;
+    if (m_ps && *m_ps == PS_FINISHED)
+        percent = 1.0;
+
     TABProject* proj = TAB_INST;
     TabLinePtr tl = proj->getTabLineAt(m_iTabLine);
     if (tl.isNull())
@@ -528,64 +551,57 @@ void QVerticalPaintHandler::paintProgress(QPainter *painter, QRect rc)
     ////一个section只接受1 2 4 8个指示图片
     QImagePtr img = g_resLoader.getImage(RID_IMG_TRIANGLE);
     QRect rcImg(rc.left(), rc.top(), img->width(), img->height());
-    int left = int(rc.left() + (rc.width() - img->width()) * m_maskPercent);
+    int left = int(rc.left() + (rc.width() - img->width()) * percent);
     rcImg.moveLeft(left);
     painter->drawImage(rcImg, *img, img->rect());
 
-    ////int wSection = beat * m_numImgHeight;
-    ////int beats = beat * sections;
-    //int numImgPadding = 0;
-    //const int validImgCountPerSec[]={1, 2, 4, 8};
-    //int imgCountPerSec = 0;
-    //for (int i=3; i>=0; --i)
-    //{
-    //    int wTotal = sections * m_numImgHeight + sections * (validImgCountPerSec[i] - 1) * m_numBgImgHeight;
-    //    if (wTotal > w)
-    //        continue;
-    //
-    //    imgCountPerSec = validImgCountPerSec[i];
-    //    numImgPadding = (w-wTotal)/(imgCountPerSec*sections);
-    //    break;
-    //}
-    //
-    //if (imgCountPerSec > 0)
-    //{
-    //    //TODO paint number image
-    //    QRect rcNum(rc.left(), rc.top(), m_numImgHeight, m_numImgHeight);
-    //    QRect rcNumBg(rc.left(), rc.top(), m_numBgImgHeight, m_numBgImgHeight);
-    //    int wPercent = rc.left() + m_maskPercent * w;
-    //
-    //    for (int s=1; s <= sections; ++s)
-    //    {
-    //        for(int n=1; n<=imgCountPerSec; ++n)
-    //        {
-    //            QRect rcUse;
-    //            QImagePtr pImg;
-    //            if (n==1)
-    //            {
-    //                rcUse = rcNum;
-    //                ResourceID rid;
-    //                if (s <= RID_IMG_NUMBER_8)
-    //                    rid = ResourceID(s%RID_IMG_NUMBER_8);
-    //                else
-    //                    rid = ResourceID(s-1+RID_IMG_NUMBER_BG_1);
-    //                pImg = g_resLoader.getImage(rid);
-    //            }
-    //            else
-    //            {
-    //                rcUse = rcNumBg;
-    //                ResourceID rid = ResourceID(s-1+RID_IMG_NUMBER_BG_1);
-    //                pImg = g_resLoader.getImage(rid);
-    //            }
-    //            if (rcUse.left() > wPercent)
-    //                painter->setOpacity(0.5);
-    //            painter->drawImage(rcUse, *pImg, pImg->rect());
-    //            rcNum.moveLeft(rcNum.left() + rcUse.width() + numImgPadding);
-    //            rcNumBg.moveLeft(rcNumBg.left() + rcUse.width() + numImgPadding);
-    //        }
-    //    }
-    //}
     painter->restore();
+}
+
+void QVerticalPaintHandler::calculateFixedItemRect(QRect rc)
+{
+    if (rc == m_rcLastPaint)
+        return;
+
+    static const int lMargin=40, rMargin=40, tMargin=0, bMargin=0, itemPadding = 20;
+    int l=rc.left() + lMargin, t=rc.top()+tMargin, w=rc.width() - lMargin - rMargin, h=rc.height()-tMargin-bMargin;
+    QSize sz = TAB_INST->getTabLineFixedSizeV();
+    int itemWidth = sz.width(), itemHeight = sz.height();
+    int totalWidth = itemWidth + m_szCoverMax.width() + itemPadding;
+    //封面+tabline最大宽度 比 窗口宽度小，则居中
+    if (totalWidth < w)
+    {
+        int l1 = l + (w-totalWidth)/2;
+        m_rcCover.setLeft(l1);
+        m_rcCover.setTop(t + h / 3 - m_szCoverMax.height() / 2);
+        m_rcCover.setRight(l1 + m_szCoverMax.width());
+        m_rcCover.setBottom(m_rcCover.top() + m_szCoverMax.height());
+
+        m_szFixedTabItem.setWidth(itemWidth);
+        m_szFixedTabItem.setHeight(itemHeight);
+
+        m_rcTabLine.setLeft(m_rcCover.right() + itemPadding);
+        m_rcTabLine.setRight(m_rcTabLine.left() + itemWidth);
+        m_rcTabLine.setTop(t);
+        m_rcTabLine.setBottom(t+h);
+    }
+    else
+    {
+        m_rcCover.setLeft(l);
+        m_rcCover.setTop(t + h / 3 - m_szCoverMax.height() / 2);
+        m_rcCover.setRight(l + m_szCoverMax.width());
+        m_rcCover.setBottom(m_rcCover.top() + m_szCoverMax.height());
+
+        int w1 = w - m_szCoverMax.width() - itemPadding;
+        int h1 = int(itemHeight/(itemWidth*1.0/w1));
+        m_szFixedTabItem.setWidth(w1);
+        m_szFixedTabItem.setHeight(h1);
+
+        m_rcTabLine.setLeft(m_rcCover.right() + itemPadding);
+        m_rcTabLine.setRight(m_rcTabLine.left() + w1);
+        m_rcTabLine.setTop(t);
+        m_rcTabLine.setBottom(t+h);
+    }
 }
 
 QSize QVerticalPaintHandler::getFixedImageSize(QRect &rcPaint, const QRect &rcImg)
@@ -599,13 +615,19 @@ QSize QVerticalPaintHandler::getFixedImageSize(QRect &rcPaint, const QRect &rcIm
     {
         double d = w * 1.0 / maxWidth;   //>1
         w = maxWidth;
-        h =  int(rcImg.height() / d);
+        h =  int(h / d);
 
     }
     //窗口比图片宽，则使用图片宽度，就OK了
-    else if (rcImg.width() < maxWidth)
+    else if (w < maxWidth)
     {
     }
 
+    if (h > m_szFixedTabItem.height())
+    {
+        double d = h * 1.0 / m_szFixedTabItem.height();   //>1
+        h = m_szFixedTabItem.height();
+        w =  int(w / d);
+    }
     return QSize(w, h);
 }

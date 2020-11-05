@@ -1,6 +1,9 @@
 #include "qtpf.h"
 #include <QFile>
 #include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "../Utils/utils.h"
 
 QTPF::QTPF()
@@ -92,7 +95,7 @@ bool QTPF::releaseToDir(QString dirPath)
     return true;
 }
 
-QImagePtr QTPF::loadCoverImage(QString tpf)
+QImagePtr QTPF::getProjectCoverImage(QString tpf)
 {
     QFile f(tpf);
     if (!f.open(QIODevice::ReadOnly))

@@ -70,6 +70,8 @@ public:
     //获取TabLine 水平/垂直拼接构成的总图片的大小
     QSize getTabLineSizeH(int padding=0);
     QSize getTabLineSizeV(int padding=0);
+    //以TabLineItem最宽那个的作为参考，获得item最大宽度，和最大宽度item的最小高度，用于统一绘制item高度
+    QSize getTabLineFixedSizeV();
 
     //@param time second, e.g. 1.2
     TabLinePtr findTabLineByTime(double time);

@@ -43,6 +43,8 @@ public:
 protected:
     virtual void paintCover(QPainter* painter, QRect rc);
     virtual void paintInfo(QPainter* painter, QRect rc);
+
+    virtual void calculateFixedItemRect(QRect rc) = 0;
 protected:
     QImagePtr m_imgBg;
     QColor    m_clrBg;
@@ -52,16 +54,21 @@ protected:
     QFPS m_fps;
     PlayStatus* m_ps;
 
-    QSize   m_szCoverMax;
+    QSize   m_szCoverMax;           //封面最大大小
     QSize   m_szTabLineImg;
     int     m_iTabLine = -1;        //当前索引
-    double  m_maskPercent = 0;
+    double  m_maskPercent = 0;      //当前tabline播放的百分比
     float   m_lastFps = 0;
-    int     m_coverAngle = 0;
+    int     m_coverAngle = 0;       //封面旋转的角度
 
     int     m_iTargetTabLine = -1;  //滚动时的目标索引
-    int     m_smoothScroll = 0;
-    const int m_smoothScrollMax = 4;
+    int     m_smoothScroll = 0;     //当前平滑滚动帧
+    const int m_smoothScrollMax = 4;//用多少帧来执行平滑滚动
+
+    QRect   m_rcLastPaint;
+    QSize   m_szFixedTabItem;       //计算得到的tabline的固定大小，防止有些特别大
+    QRect   m_rcTabLine;            //计算得到的tabline的绘制区域
+    QRect   m_rcCover;              //计算得到的封面位置
 };
 
 class QHorizontalPaintHandler : public IPaintHandler
@@ -72,6 +79,10 @@ public:
     virtual void onPaint(QPainter* painter, QRect rc) override;
 
     virtual void init() override;
+
+protected:
+    virtual void calculateFixedItemRect(QRect rc) override;
+
 protected:
     double m_tabLineYPos = 0.5;
 };
@@ -87,6 +98,8 @@ public:
 protected:
     virtual void paintInfo(QPainter* painter, QRect rc) override;
     void paintProgress(QPainter* painter, QRect rc);
+
+    virtual void calculateFixedItemRect(QRect rc) override;
 
     QSize getFixedImageSize(QRect& rcPaint, const QRect &rcImg);
     void drawRoundImage(QPainter *painter, QRect rcPaint, QImagePtr img, QRect rcImg);
