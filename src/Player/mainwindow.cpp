@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widgetPlayer, &QTabLineGLWidget::signalTabLineChanged, this, &MainWindow::onPlayerTabLineChanged);
     setWindowTitle(tr("Player"));
     setWindowIcon(QIcon(":/image/resource/logo.ico"));
+    setAcceptDrops(true);
 }
 
 MainWindow::~MainWindow()
@@ -24,14 +25,6 @@ MainWindow::~MainWindow()
 void MainWindow::initUI()
 {
     qDebug() << TAB_INST->getSingerName();
-
-    //ui->labelSongDesc->setText(TAB_INST->getMusicInfo());
-    //ui->labelSingerName->setText(TAB_INST->getMusicTitle());
-    //ui->labelSingerName->setText(TAB_INST->getSingerName());
-    //ui->labelSingerInfo->setText(TAB_INST->getSingerInfo());
-    //ui->btnCover->setStyleSheet();
-    //ui->btnSingerImg->setImage(TAB_INST->getSingerImg());
-    //ui->btnCoverImg->setImage(TAB_INST->getCoverImg());
 
     ui->widgetPlayer->reset();
     ui->widgetPlayer->init();
@@ -65,6 +58,7 @@ bool MainWindow::openProject(QString strProj)
         box.setIcon(QMessageBox::Critical);
         box.setText(tr("Cannot open project!"));
         box.exec();
+        initUI();
     }
 
     return false;
@@ -183,4 +177,24 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 
         setWindowState(ws);
     }
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (!event->mimeData()->hasFormat("text/uri-list"))
+        return;
+
+    QList<QUrl> urls = event->mimeData()->urls();
+    if (urls.size() == 1 && QFileUtil::getFileExt(urls.front().path()).compare(PROJ_FILE_EXT, Qt::CaseInsensitive) == 0)
+        event->acceptProposedAction();
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    if (!event->mimeData()->hasUrls())
+        return;
+
+    QList<QUrl> urls = event->mimeData()->urls();
+    if (urls.size() == 1 && QFileUtil::getFileExt(urls.front().toLocalFile()).compare(PROJ_FILE_EXT, Qt::CaseInsensitive) == 0)
+        openProject(urls.front().toLocalFile());
 }
