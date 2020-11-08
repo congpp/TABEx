@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets opengl
+QT       += core gui widgets opengl sql
 
 TARGET = Player
 TEMPLATE = app
@@ -32,6 +32,7 @@ SOURCES += \
     qtimerex.cpp \
     painthandler.cpp \
     resourceloader.cpp \
+    userconfig.cpp \
     welcomedialog.cpp \
     qhistorytabledelegate.cpp
 
@@ -44,6 +45,7 @@ HEADERS += \
     qtimerex.h \
     painthandler.h \
     resourceloader.h \
+    userconfig.h \
     welcomedialog.h \
     qhistorytabledelegate.h
 

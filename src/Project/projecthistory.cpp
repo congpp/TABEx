@@ -25,7 +25,7 @@ bool ProjectHistory::add(QString projFile, QString uuid, int adjustedBeat)
 {
     for (auto it = m_history.begin(); it != m_history.end();)
     {
-        if (it->uuid.compare(uuid, Qt::CaseInsensitive) == 0)
+        if (it->filePath.compare(projFile, Qt::CaseInsensitive) == 0)
             it = m_history.erase(it);
         else
             it++;

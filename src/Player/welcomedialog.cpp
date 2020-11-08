@@ -3,6 +3,7 @@
 #include "qhistorytabledelegate.h"
 #include "../Project/tabproject.h"
 #include "mainwindow.h"
+#include "resourceloader.h"
 
 #include <QtWidgets>
 
@@ -14,7 +15,7 @@ WelcomeDialog::WelcomeDialog(QWidget *parent) :
     setWindowIcon(QIcon(":/image/resource/logo.ico"));
 
     this->setWindowFlag(Qt::FramelessWindowHint);
-    //this->setAttribute(Qt::WA_TranslucentBackground);
+    this->setAttribute(Qt::WA_TranslucentBackground);
 
     m_pDelegate = new QHistoryTableDelegate(this);
     ui->tableView->setModel(TAB_INST->getHistoryModel());
@@ -66,6 +67,17 @@ void WelcomeDialog::mouseReleaseEvent(QMouseEvent *event)
     {
         event->accept();
         m_dragging=false;
+    }
+}
+
+void WelcomeDialog::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    QImagePtr img = g_resLoader.getImage(RID_IMG_WELCOME_BG);
+    if (img)
+    {
+        QPainter p(this);
+        p.drawImage(rect(), *img, img->rect());
     }
 }
 

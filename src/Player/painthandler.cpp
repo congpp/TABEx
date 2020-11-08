@@ -127,13 +127,13 @@ void IPaintHandler::paintCover(QPainter *painter, QRect rc)
         pcd.begin(&cd);
         pcd.setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform);
         QPainterPath pp1, pp2;
-        pp1.addEllipse(QPointF(160.5,160.5),114,114);
+        pp1.addEllipse(QPointF(160.5,160.5),86,86);
         //pp2.addEllipse(QPoint(160,160),40,40);
         pcd.setClipPath(pp1);
         //pcd.setOpacity(0.8);
         if (!imgCover.isNull())
         {
-            pcd.drawImage(cd.rect(), *imgCover);
+            pcd.drawImage(pp1.boundingRect(), *imgCover);
         }
         pcd.end();
     }
@@ -485,11 +485,24 @@ void QVerticalPaintHandler::paintInfo(QPainter *painter, QRect rc)
 
     painter->save();
     painter->setRenderHint(QPainter::TextAntialiasing);
+
+    static const QFont f1("", 16, QFont::Bold);
+    static const QFont f2("", 20, QFont::Bold);
+    static const QFont f3("", 24, QFont::Bold);
+    static const QPen pen(QColor(0xFF,0xFF,0xFF));
+    static const int textPadding = 5;
+    //先显示歌曲名字
+    QRect rcName=rc;
+    rcName.setHeight(34);
+    painter->setFont(f3);
+    painter->setPen(pen);
+    painter->drawText(rcName, Qt::AlignCenter|Qt::AlignVCenter, proj->getMusicTitle());
+
+    rc.setTop(rcName.bottom() + textPadding);
     //cover下面区域切成左右两边
     //左边标题，底部+右对齐
     //右边值，底部+左对齐
-    const int infoHeight = 36;
-    const int textPadding = 5;
+    const int infoHeight = 28;
     QRect rcL(rc);
     rcL.setWidth(rc.width()/2 - textPadding);
     rcL.setHeight(infoHeight);
@@ -497,9 +510,6 @@ void QVerticalPaintHandler::paintInfo(QPainter *painter, QRect rc)
     rcR.setLeft(rc.left()+rc.width()/2 + textPadding);
     rcR.setHeight(infoHeight);
 
-    static const QFont f1("", 16, QFont::Bold);
-    static const QFont f2("", 26, QFont::Bold);
-    static const QPen pen(QColor(0xFF,0xFF,0xFF));
     QString str;
 
     struct InfoMap

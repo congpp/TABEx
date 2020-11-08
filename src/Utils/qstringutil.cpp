@@ -24,3 +24,15 @@ QString QStringUtil::double2MMSS(double t)
     int i = int(t);
     return QString::asprintf("%02d:%02d", i/60, i%60);
 }
+
+QString QStringUtil::int64ToString(qint64 n)
+{
+    return QString::asprintf("%lld", n);
+}
+
+qint64 QStringUtil::string2Int64(QString str)
+{
+    qint64 n = 0;
+    sscanf_s(str.toLocal8Bit().data(), "%lld", &n);
+    return n;
+}

@@ -172,6 +172,7 @@ void QTabLineGLWidget::animatePlay()
     qint64 iElapsed = m_timer.elapsed();
     if (m_iTimeCurrent == m_iTimeTotal || iElapsed >= m_iTimeTotal)
     {
+        qDebug() << "animate elapsed: " << m_iTimeCurrent << "/" << m_iTimeTotal << " " << iElapsed;
         setPlayingTabLine(m_iTabLine + 1, true);
     }
     else if (iElapsed + m_pTimerPlay->interval() > m_iTimeTotal)
@@ -186,7 +187,6 @@ void QTabLineGLWidget::animatePlay()
     }
 
     repaint();
-    //qDebug() << "animateMask: " << m_iMaskTick << "/" << m_iMaskTotal;
 }
 
 void QTabLineGLWidget::slotOnThreadFinished()
