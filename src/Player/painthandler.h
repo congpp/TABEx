@@ -32,7 +32,7 @@ public:
     virtual void init();
     virtual void setPlayStatus(PlayStatus* ps);
 
-    virtual void setTabLineSize(QSize szTL);
+    virtual void setFixedTabLineSize(QSize szTL);
     virtual void setBackgroundImage(QImagePtr img, QColor clr);
     virtual void setTabLineIndex(int idx);
     virtual void setTabLineMaskPercent(double percent);
@@ -55,7 +55,7 @@ protected:
     PlayStatus* m_ps;
 
     QSize   m_szCoverMax;           //封面最大大小
-    QSize   m_szTabLineImg;
+    QSize   m_szTabLineImg;         //所有tabline拼合构成的图片的尺寸
     int     m_iTabLine = -1;        //当前索引
     double  m_maskPercent = 0;      //当前tabline播放的百分比
     float   m_lastFps = 0;
@@ -69,6 +69,7 @@ protected:
     QSize   m_szFixedTabItem;       //计算得到的tabline的固定大小，防止有些特别大
     QRect   m_rcTabLine;            //计算得到的tabline的绘制区域
     QRect   m_rcCover;              //计算得到的封面位置
+    QSize   m_szFixedTabItemUser;   //用户指定的tabline的固定大小，会调整tabline的布局
 };
 
 class QHorizontalPaintHandler : public IPaintHandler

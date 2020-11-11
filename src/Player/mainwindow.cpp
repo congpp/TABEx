@@ -5,6 +5,7 @@
 #include "welcomedialog.h"
 #include <QtWidgets>
 #include <QDebug>
+#include <QValidator>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,6 +16,15 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle(tr("Player"));
     setWindowIcon(QIcon(":/image/resource/logo.ico"));
     setAcceptDrops(true);
+    QStringList nums;
+    nums << "Auto" << "100" << "200" << "300";
+    ui->comboBoxLineHeight->addItems(nums);
+    connect(ui->comboBoxLineHeight, &QLineHeightComboBox::signalLineHeightChanged, [&](int h)
+    {
+        cfg.fixedHeight = h;
+        g_userCfg->setUserTpfConfig(cfg);
+        ui->widgetPlayer->slogOnTabLineHeightChanged(h);
+    });
 }
 
 MainWindow::~MainWindow()
@@ -49,6 +59,12 @@ bool MainWindow::openProject(QString strProj)
 {
     if (TAB_INST->openProject(strProj))
     {
+        cfg.tpf = strProj;
+        if (g_userCfg->getUserTpfConfig(cfg))
+        {
+            TAB_INST->adjustSpeed(cfg.adjustedBpm);
+        }
+
         initUI();
         return true;
     }
@@ -58,6 +74,8 @@ bool MainWindow::openProject(QString strProj)
         box.setIcon(QMessageBox::Critical);
         box.setText(tr("Cannot open project!"));
         box.exec();
+
+        cfg = UserTpfConfig();
         initUI();
     }
 
@@ -122,6 +140,13 @@ void MainWindow::on_btnSlowDown_clicked()
     if (TAB_INST->currentProject().isEmpty())
         return;
 
+    int bpm = TAB_INST->adjustSpeed(cfg.adjustedBpm-1);
+    if (cfg.adjustedBpm != bpm)
+    {
+        cfg.adjustedBpm = bpm;
+        g_userCfg->setUserTpfConfig(cfg);
+    }
+
     ui->widgetPlayer->slowDown();
 }
 
@@ -130,6 +155,13 @@ void MainWindow::on_btnSpeedUp_clicked()
     if (TAB_INST->currentProject().isEmpty())
         return;
 
+    int bpm = TAB_INST->adjustSpeed(cfg.adjustedBpm+1);
+    if (cfg.adjustedBpm != bpm)
+    {
+        cfg.adjustedBpm = bpm;
+        g_userCfg->setUserTpfConfig(cfg);
+    }
+
     ui->widgetPlayer->speedUp();
 }
 
@@ -137,6 +169,13 @@ void MainWindow::on_btnResetSpeed_clicked()
 {
     if (TAB_INST->currentProject().isEmpty())
         return;
+
+    TAB_INST->adjustSpeed(0);
+    if (cfg.adjustedBpm != 0)
+    {
+        cfg.adjustedBpm = 0;
+        g_userCfg->setUserTpfConfig(cfg);
+    }
 
     ui->widgetPlayer->resetSpeed();
 }
@@ -197,4 +236,9 @@ void MainWindow::dropEvent(QDropEvent *event)
     QList<QUrl> urls = event->mimeData()->urls();
     if (urls.size() == 1 && QFileUtil::getFileExt(urls.front().toLocalFile()).compare(PROJ_FILE_EXT, Qt::CaseInsensitive) == 0)
         openProject(urls.front().toLocalFile());
+}
+
+void MainWindow::on_comboBoxLineHeight_currentTextChanged(const QString &arg1)
+{
+    qDebug() << arg1;
 }

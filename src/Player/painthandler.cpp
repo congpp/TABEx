@@ -50,9 +50,10 @@ void IPaintHandler::setPlayStatus(PlayStatus *ps)
     }
 }
 
-void IPaintHandler::setTabLineSize(QSize szTL)
+void IPaintHandler::setFixedTabLineSize(QSize szTL)
 {
-    m_szTabLineImg = szTL;
+    m_szFixedTabItemUser = szTL;
+    m_rcLastPaint=QRect();
 }
 
 void IPaintHandler::setBackgroundImage(QImagePtr img, QColor clr)
@@ -570,12 +571,15 @@ void QVerticalPaintHandler::paintProgress(QPainter *painter, QRect rc)
 
 void QVerticalPaintHandler::calculateFixedItemRect(QRect rc)
 {
-    if (rc == m_rcLastPaint)
+    if (m_rcLastPaint.isValid() && rc == m_rcLastPaint)
         return;
 
     static const int lMargin=40, rMargin=40, tMargin=0, bMargin=0, itemPadding = 20;
     int l=rc.left() + lMargin, t=rc.top()+tMargin, w=rc.width() - lMargin - rMargin, h=rc.height()-tMargin-bMargin;
     QSize sz = TAB_INST->getTabLineFixedSizeV();
+    if (m_szFixedTabItemUser.height() > 0)
+        sz.setHeight(m_szFixedTabItemUser.height());
+
     int itemWidth = sz.width(), itemHeight = sz.height();
     int totalWidth = itemWidth + m_szCoverMax.width() + itemPadding;
     //封面+tabline最大宽度 比 窗口宽度小，则居中

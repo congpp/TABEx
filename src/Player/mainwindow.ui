@@ -152,6 +152,16 @@ background-color: rgba(255, 255, 255, 128);
            </widget>
           </item>
           <item>
+           <widget class="QLineHeightComboBox" name="comboBoxLineHeight">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+            <property name="currentText">
+             <string>Auto</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btnSlowDown">
             <property name="minimumSize">
              <size>
@@ -262,6 +272,11 @@ background-color: rgba(255, 255, 255, 128);
    <extends>QWidget</extends>
    <header location="global">qtablineglwidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QLineHeightComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qlineheightcombobox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

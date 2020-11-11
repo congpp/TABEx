@@ -7,11 +7,11 @@
 #include <QDateTime>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QSqlError>
 #include <QDebug>
 
 #define USER_CONFIG_FILE_NAME   "userconfig.db"
 #define TPF_TABLE               "tpf_config"
-#define TPF_ID                  "id"
 #define TPF_PATH                "tpf"
 #define TPF_FIXED_HEIGHT        "fixedHeight"
 #define TPF_ADJUSTED_SPEED      "adjustSpeed"
@@ -21,7 +21,12 @@
 
 UserConfig::UserConfig()
 {
+    open();
+}
 
+UserConfig::~UserConfig()
+{
+    close();
 }
 
 UserConfig *UserConfig::instance()
@@ -30,35 +35,24 @@ UserConfig *UserConfig::instance()
     return &cfg;
 }
 
-bool UserConfig::save()
+bool UserConfig::close()
 {
-    QString filePath = getSavePath();
-    if (!QFile::exists(filePath))
-        return false;
-
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(filePath);
-    if (!db.open())
+    if (!m_db.open())
     {
-        qDebug() << "Cannot open database: " << filePath;
+        qDebug() << "Database is not open!";
         return false;
     }
 
-    //tpf config
-    createTpfConfigTableIfNotExists();
-
+    m_db.close();
     return true;
 }
 
 bool UserConfig::open()
 {
     QString filePath = getSavePath();
-    if (!QFile::exists(filePath))
-        return false;
-
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(filePath);
-    if (!db.open())
+    m_db = QSqlDatabase::addDatabase("QSQLITE");
+    m_db.setDatabaseName(filePath);
+    if (!m_db.open())
     {
         qDebug() << "Cannot open database: " << filePath;
         return false;
@@ -69,53 +63,90 @@ bool UserConfig::open()
     return true;
 }
 
-int UserConfig::adjustTpfBpm(QString tpf, int bpm)
+bool UserConfig::setUserTpfConfig(UserTpfConfig &cfg)
 {
-    return bpm;
-}
+    if (!m_db.isOpen() || cfg.tpf.isEmpty())
+        return false;
 
-int UserConfig::getTpfAdjustedBpm(QString tpf)
-{
-    if (!m_db.isOpen())
-        return 0;
+    if (!m_db.transaction())
+        return false;
 
     QSqlQuery query(m_db);
-    QString sql("select " TPF_ADJUSTED_SPEED " from " TPF_TABLE " where " TPF_PATH " = ");
-    sql.append(tpf);
-    sql.append(';');
+    query.prepare("insert or replace into " TPF_TABLE " values(:tpf, :height, :speed, :time);");
+    query.bindValue(0, cfg.tpf.toLower());
+    query.bindValue(1, cfg.fixedHeight);
+    query.bindValue(2, cfg.adjustedBpm);
+    query.bindValue(3, QStringUtil::int64ToString(cfg.lastAccess));
 
-    if (query.exec(sql))
+    if (!query.exec())
     {
-        return query.record().value(TPF_ADJUSTED_SPEED).toInt();
+        qDebug() << query.lastError();
+        m_db.rollback();
+        return false;
+    }
+    m_db.commit();
+    return true;
+}
+
+
+
+bool UserConfig::getUserTpfConfig(UserTpfConfig &cfg)
+{
+    if (!m_db.isOpen() || cfg.tpf.isEmpty())
+        return false;
+
+    QSqlQuery query(m_db);
+    QString sql("select * from " TPF_TABLE " where " TPF_PATH " =\"" TPF_PATH "\";");
+    if (query.exec(sql) && query.next())
+    {
+        cfg.adjustedBpm = query.record().value(TPF_ADJUSTED_SPEED).toInt();
+        cfg.fixedHeight = query.record().value(TPF_FIXED_HEIGHT).toInt();
+        cfg.lastAccess = QStringUtil::string2Int64(query.record().value(TPF_LASTACCESS).toString());
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 QString UserConfig::getSavePath()
 {
-    return QDir::homePath() + PROJ_PATH_ROOT + "/" + USER_CONFIG_FILE_NAME;
+    return QDir::homePath() + PROJ_PATH_ROOT + USER_CONFIG_FILE_NAME;
 }
 
 bool UserConfig::createTpfConfigTableIfNotExists()
 {
-    QString sql("create table " TPF_TABLE "("
-                  TPF_ID " INTEGER primary key,"
-                  TPF_PATH " TEXT,"
+    if (!m_db.isOpen())
+        return false;
+
+    QString sqlCreateTable("create table " TPF_TABLE " ("
+                  TPF_PATH " TEXT primary key,"
                   TPF_FIXED_HEIGHT " INTEGER,"
                   TPF_ADJUSTED_SPEED " INTEGER,"
-                  TPF_LASTACCESS " INTEGER);");
-    TABLE_CHECK(isTableExists(TPF_TABLE));
+                  TPF_LASTACCESS " TEXT);");
 
+    if (!isTableExists(TPF_TABLE))
+    {
+        if (!m_db.transaction())
+            return false;
+
+        QSqlQuery query(m_db);
+        if (!query.exec(sqlCreateTable))
+        {
+            qDebug() << query.lastError();
+            m_db.rollback();
+            return false;
+        }
+        m_db.commit();
+    }
     return true;
 }
 
 bool UserConfig::isTableExists(QString tableName)
 {
     QSqlQuery query(m_db);
-    if (query.exec("select * from sqlite_master where name = \"" + tableName + "\""))
+    if (query.exec("select name from sqlite_master where name = \"" + tableName + "\""))
     {
-        return query.record().count() > 0;
+        return query.next();
     }
     return false;
 }

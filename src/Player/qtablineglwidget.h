@@ -80,6 +80,7 @@ signals:
 public slots:
     void animatePlay();
     void slotOnThreadFinished();
+    void slogOnTabLineHeightChanged(int h);
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
@@ -109,7 +110,7 @@ private:
 
     QSize m_szTabLineImg;
 
-    int m_iSpeedIndex = 0;
+    //int m_iSpeedIndex = 0;
 
     PaintHandlerPtr m_paintHandler;
 };

@@ -34,7 +34,8 @@ SOURCES += \
     resourceloader.cpp \
     userconfig.cpp \
     welcomedialog.cpp \
-    qhistorytabledelegate.cpp
+    qhistorytabledelegate.cpp \
+    qlineheightcombobox.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     resourceloader.h \
     userconfig.h \
     welcomedialog.h \
-    qhistorytabledelegate.h
+    qhistorytabledelegate.h \
+    qlineheightcombobox.h
 
 FORMS += \
         mainwindow.ui \

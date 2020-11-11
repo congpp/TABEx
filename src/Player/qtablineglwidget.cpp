@@ -148,21 +148,21 @@ int QTabLineGLWidget::getFPS()
 
 void QTabLineGLWidget::speedUp()
 {
-    m_iSpeedIndex++;
+    //m_iSpeedIndex++;
     adjustSpeed();
     repaint();
 }
 
 void QTabLineGLWidget::slowDown()
 {
-    m_iSpeedIndex--;
+    //m_iSpeedIndex--;
     adjustSpeed();
     repaint();
 }
 
 void QTabLineGLWidget::resetSpeed()
 {
-    m_iSpeedIndex = 0;
+    //m_iSpeedIndex = 0;
     adjustSpeed();
     repaint();
 }
@@ -195,6 +195,12 @@ void QTabLineGLWidget::slotOnThreadFinished()
     if (TAB_INST->getTabLineCount() > 0)
         m_paintHandler->setTabLineIndex(0);
     repaint();
+}
+
+void QTabLineGLWidget::slogOnTabLineHeightChanged(int h)
+{
+    m_paintHandler->setFixedTabLineSize(QSize(0, h));
+    update();
 }
 
 void QTabLineGLWidget::paintEvent(QPaintEvent *event)
@@ -286,7 +292,7 @@ void QTabLineGLWidget::startTimerPlayNext()
 
 void QTabLineGLWidget::adjustSpeed()
 {
-    m_iSpeedIndex = TAB_INST->adjustSpeed(m_iSpeedIndex);
+    //m_iSpeedIndex = TAB_INST->adjustSpeed(m_iSpeedIndex);
     double currTotal = TAB_INST->getSecondAtTabLine(m_iTabLine) * 1000;;
     double lastTotal = m_iTimeTotal;
     m_iTimeTotal = int(currTotal);

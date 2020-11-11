@@ -600,7 +600,7 @@ QSize TABProject::getTabLineFixedSizeV()
         if (w1 > w)
         {
             w = w1;
-            h = std::min(h, tl->rcPos.height());
+            h = tl->rcPos.height();//std::min(h, tl->rcPos.height());
         }
     }
 

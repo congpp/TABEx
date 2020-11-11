@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "userconfig.h"
 
 namespace Ui {
 class MainWindow;
@@ -43,8 +44,12 @@ private slots:
     void onPlayerTabLineChanged(int iTabLine);
     void on_actionExit_triggered();
 
+    void on_comboBoxLineHeight_currentTextChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
+
+    UserTpfConfig cfg;
 };
 
 #endif // MAINWINDOW_H

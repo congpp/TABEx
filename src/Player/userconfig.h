@@ -22,16 +22,16 @@ protected:
     UserConfig();
     UserConfig(UserConfig&);
 public:
+    ~UserConfig();
     static UserConfig *instance();
 
-    bool save();
+    bool close();
     bool open();
 
 
-    //通过调整节拍器的每分钟节拍数来调整整首歌的速度
-    int adjustTpfBpm(QString tpf, int bpm);
-    int getTpfAdjustedBpm(QString tpf);
-
+    //
+    bool setUserTpfConfig(UserTpfConfig& cfg);
+    bool getUserTpfConfig(UserTpfConfig& cfg);
 protected:
     QString getSavePath();
     bool createTpfConfigTableIfNotExists();
@@ -39,5 +39,7 @@ protected:
 protected:
     QSqlDatabase m_db;
 };
+
+#define g_userCfg UserConfig::instance()
 
 #endif // USERCONFIG_H
