@@ -31,6 +31,8 @@ void ResourceLoader::loadImages()
     ptrImg.reset(new QImage(":/image/resource/image/welcome2.png"));
     m_imgs[RID_IMG_WELCOME2_BG] = ptrImg;
 
+    ptrImg.reset(new QImage(":/image/resource/image/shadow.png"));
+    m_imgs[RID_IMG_SHADOW] = ptrImg;
 }
 
 void ResourceLoader::registerExternalImage(QString key, QImagePtr img)

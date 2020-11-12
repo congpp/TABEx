@@ -20,28 +20,63 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">*{
+    font: 9pt &quot;微软雅黑&quot;;
+}
+#widgetTitle{
+    background-color: rgba(0, 0, 0, 16);
+}
+#widgetPlayBar{
+    background-color: rgba(0, 0, 0, 64);
+}
+QLabel
+{
+    color: #FFFFFF;
+}
+/* === QPushButton === */
+QPushButton {
+    border: 1px solid #444444;
+    padding: 4px;
+    color: #FFFFFF;
+    background-color: #222222;
+}
+ 
+QPushButton:hover {
+    background-color: #333333;
+    border-color: #444444;
+}
+ 
+QPushButton:pressed {
+    background-color: #111111;
+    border-color: #333333;
+    color: yellow;
+}
+ 
+QPushButton:disabled {
+    color: #333333;
+}
+</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
      <number>0</number>
     </property>
     <property name="leftMargin">
-     <number>0</number>
+     <number>8</number>
     </property>
     <property name="topMargin">
-     <number>0</number>
+     <number>8</number>
     </property>
     <property name="rightMargin">
-     <number>0</number>
+     <number>8</number>
     </property>
     <property name="bottomMargin">
-     <number>0</number>
+     <number>8</number>
     </property>
     <item>
      <widget class="QTabLineGLWidget" name="widgetPlayer" native="true">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -55,6 +90,109 @@
         <number>0</number>
        </property>
        <item>
+        <widget class="QWidget" name="widgetTitle" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>32</height>
+          </size>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="labelTitle">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonMin">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonMax">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>[ ]</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonClose">
+            <property name="minimumSize">
+             <size>
+              <width>42</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>42</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>x</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -62,16 +200,22 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>495</height>
+           <height>50</height>
           </size>
          </property>
         </spacer>
        </item>
        <item>
         <widget class="QWidget" name="widgetPlayBar" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="styleSheet">
           <string notr="true">#widgetPlayBar{
-background-color: rgba(255, 255, 255, 128);
+background-color: rgba(0, 0, 0, 64);
 }</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -91,8 +235,8 @@ background-color: rgba(255, 255, 255, 128);
            <widget class="QPushButton" name="btnLeft">
             <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>0</width>
+              <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -110,8 +254,8 @@ background-color: rgba(255, 255, 255, 128);
            <widget class="QPushButton" name="btnPlay">
             <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>0</width>
+              <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -129,8 +273,8 @@ background-color: rgba(255, 255, 255, 128);
            <widget class="QPushButton" name="btnRight">
             <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>0</width>
+              <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -146,6 +290,32 @@ background-color: rgba(255, 255, 255, 128);
           </item>
           <item>
            <widget class="QSlider" name="progress">
+            <property name="styleSheet">
+             <string notr="true">QSlider::groove:horizontal {
+    border: 0px;
+    height: 4px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #212121, stop:1 #444444);
+    margin: 2px 0;
+}
+
+QSlider::handle:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
+    border: 1px solid #5c5c5c;
+    width: 8px;
+    margin: -2px 0;
+    border-radius: 3px;
+}
+QSlider::add-page:vertical {
+  background: white;
+}
+
+QSlider::sub-page:vertical {
+  background: pink;
+}</string>
+            </property>
+            <property name="pageStep">
+             <number>1</number>
+            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -165,8 +335,8 @@ background-color: rgba(255, 255, 255, 128);
            <widget class="QPushButton" name="btnSlowDown">
             <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>0</width>
+              <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -187,8 +357,8 @@ background-color: rgba(255, 255, 255, 128);
            <widget class="QPushButton" name="btnResetSpeed">
             <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>0</width>
+              <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -209,8 +379,8 @@ background-color: rgba(255, 255, 255, 128);
            <widget class="QPushButton" name="btnSpeedUp">
             <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>0</width>
+              <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -234,25 +404,6 @@ background-color: rgba(255, 255, 255, 128);
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1024</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionOpen"/>
-    <addaction name="separator"/>
-    <addaction name="actionExit"/>
-   </widget>
-   <addaction name="menuFile"/>
   </widget>
   <action name="actionOpen">
    <property name="text">

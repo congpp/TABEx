@@ -13,6 +13,17 @@ QLineHeightComboBox::~QLineHeightComboBox()
     if (m_pValidator) delete m_pValidator;
 }
 
+void QLineHeightComboBox::setHeight(int h)
+{
+    if (h < m_pValidator->bottom())
+        h = m_pValidator->bottom();
+    else if (h > m_pValidator->top())
+        h = m_pValidator->top();
+
+    this->lineEdit()->setText(QString::asprintf("%d", h));
+    emit signalLineHeightChanged(h);
+}
+
 void QLineHeightComboBox::slotOnCurrentIndexChanged(int index)
 {
     if (index == 0)

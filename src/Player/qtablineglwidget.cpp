@@ -214,7 +214,7 @@ void QTabLineGLWidget::paintEvent(QPaintEvent *event)
     painter.begin(this);
     painter.setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform);
 
-    QRect rc = this->geometry();
+    QRect rc = this->rect();
     QRect rcLoading(rc.left() + rc.width()/2 - szLoading.width()/2, rc.top() + rc.height()/2 - szLoading.height()/2,
                     szLoading.width(), szLoading.height());
 

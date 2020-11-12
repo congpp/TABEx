@@ -8,12 +8,13 @@ class QLineHeightComboBox : public QComboBox
 public:
     QLineHeightComboBox(QWidget* parent = nullptr);
     ~QLineHeightComboBox() override;
-    // QWidget interface
 
+    void setHeight(int h);
 signals:
     void signalLineHeightChanged(int height);
 public slots:
     void slotOnCurrentIndexChanged(int index);
+
 protected:
     virtual void keyReleaseEvent(QKeyEvent *event) override;
     virtual void focusOutEvent(QFocusEvent *event) override;
@@ -21,7 +22,7 @@ protected:
     void checkEditText();
 
 private:
-    QValidator *m_pValidator = nullptr;
+    QIntValidator *m_pValidator = nullptr;
 };
 
 #endif // QLINEHEIGHTCOMBOBOX_H

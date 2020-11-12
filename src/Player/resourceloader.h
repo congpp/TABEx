@@ -13,6 +13,7 @@ enum ResourceID
     RID_IMG_TRIANGLE,
     RID_IMG_WELCOME_BG,
     RID_IMG_WELCOME2_BG,
+    RID_IMG_SHADOW,
 };
 
 class ResourceLoader

@@ -578,7 +578,11 @@ void QVerticalPaintHandler::calculateFixedItemRect(QRect rc)
     int l=rc.left() + lMargin, t=rc.top()+tMargin, w=rc.width() - lMargin - rMargin, h=rc.height()-tMargin-bMargin;
     QSize sz = TAB_INST->getTabLineFixedSizeV();
     if (m_szFixedTabItemUser.height() > 0)
+    {
+        int newWidth = int(sz.width() * (m_szFixedTabItemUser.height() * 1.0 / sz.height()));
+        sz.setWidth(newWidth);
         sz.setHeight(m_szFixedTabItemUser.height());
+    }
 
     int itemWidth = sz.width(), itemHeight = sz.height();
     int totalWidth = itemWidth + m_szCoverMax.width() + itemPadding;

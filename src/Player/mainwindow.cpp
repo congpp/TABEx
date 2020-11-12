@@ -13,9 +13,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->widgetPlayer, &QTabLineGLWidget::signalTabLineChanged, this, &MainWindow::onPlayerTabLineChanged);
-    setWindowTitle(tr("Player"));
     setWindowIcon(QIcon(":/image/resource/logo.ico"));
     setAcceptDrops(true);
+    setWindowFlag(Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_TranslucentBackground);
+
+
+    setWindowTitle(tr("Player"));
+
     QStringList nums;
     nums << "Auto" << "100" << "200" << "300";
     ui->comboBoxLineHeight->addItems(nums);
@@ -36,6 +41,14 @@ void MainWindow::initUI()
 {
     qDebug() << TAB_INST->getSingerName();
 
+    cfg.tpf = TAB_INST->currentProject();
+    if (g_userCfg->getUserTpfConfig(cfg))
+    {
+        TAB_INST->adjustSpeed(cfg.adjustedBpm);
+        ui->comboBoxLineHeight->setHeight(cfg.fixedHeight);
+    }
+
+
     ui->widgetPlayer->reset();
     ui->widgetPlayer->init();
 
@@ -49,22 +62,42 @@ void MainWindow::wheelEvent(QWheelEvent *event)
 {
     event->accept();
     int delta = event->delta();
-    if (delta > 0)
-        on_btnLeft_clicked();
+    bool bCtrlPressed = QGuiApplication::keyboardModifiers() == Qt::ControlModifier;
+    if (bCtrlPressed)
+    {
+        ui->comboBoxLineHeight->setHeight(cfg.fixedHeight + ((delta > 0) ? 10 : -10));
+    }
     else
-        on_btnRight_clicked();
+    {
+        if (delta > 0)
+            on_btnLeft_clicked();
+        else
+            on_btnRight_clicked();
+    }
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    QImagePtr pShadow = g_resLoader.getImage(RID_IMG_SHADOW);
+    if (pShadow)
+    {
+        QPainter painter(this);
+        QRect rc = rect();
+        QPainterUtil::paintScale9(&painter, *pShadow, rc, 8);
+    }
+}
+
+void MainWindow::setWindowTitle(QString strTitle)
+{
+    QMainWindow::setWindowTitle(strTitle);
+    ui->labelTitle->setText(strTitle);
 }
 
 bool MainWindow::openProject(QString strProj)
 {
     if (TAB_INST->openProject(strProj))
     {
-        cfg.tpf = strProj;
-        if (g_userCfg->getUserTpfConfig(cfg))
-        {
-            TAB_INST->adjustSpeed(cfg.adjustedBpm);
-        }
-
         initUI();
         return true;
     }
@@ -218,6 +251,43 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        QRect rc = ui->labelTitle->rect();
+        QPoint ptLT = ui->widgetTitle->mapToGlobal(rc.topLeft());
+        QPoint ptRB = ui->widgetTitle->mapToGlobal(rc.bottomRight());
+        rc = QRect(ptLT, ptRB);
+        QPoint pt = event->globalPos();
+        qDebug() << rc << pt;
+        if (rc.contains(pt))
+        {
+            m_dragging = true;
+            m_dragPosition = event->globalPos() - this->pos();
+            event->accept();
+        }
+    }
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    if (m_dragging && (event->buttons() == Qt::LeftButton))
+    {
+        move(event->globalPos() - m_dragPosition);
+        event->accept();
+    }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (m_dragging)
+    {
+        event->accept();
+        m_dragging=false;
+    }
+}
+
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     if (!event->mimeData()->hasFormat("text/uri-list"))
@@ -238,7 +308,29 @@ void MainWindow::dropEvent(QDropEvent *event)
         openProject(urls.front().toLocalFile());
 }
 
-void MainWindow::on_comboBoxLineHeight_currentTextChanged(const QString &arg1)
+void MainWindow::on_pushButtonClose_clicked()
 {
-    qDebug() << arg1;
+    QGuiApplication::exit(0);
+}
+
+void MainWindow::on_pushButtonMax_clicked()
+{
+    static Qt::WindowStates wsOld = Qt::WindowNoState;
+    Qt::WindowStates ws = windowState();
+    if (ws == Qt::WindowMaximized)
+    {
+        ws = wsOld;
+    }
+    else
+    {
+        wsOld = ws;
+        ws = Qt::WindowMaximized;
+    }
+
+    setWindowState(ws);
+}
+
+void MainWindow::on_pushButtonMin_clicked()
+{
+    setWindowState(Qt::WindowMinimized);
 }

@@ -7,5 +7,6 @@
         <file>resource/image/user.png</file>
         <file>resource/image/welcome.png</file>
         <file>resource/image/welcome2.png</file>
+        <file>resource/image/shadow.png</file>
     </qresource>
 </RCC>
