@@ -81,13 +81,8 @@ bool TABProject::openProject(QString strProjFile)
 
     m_projFile = strProjFile;
 
-    //读取上次用户调整的速度
-    ProjectHistoryInfo hi;
-    if (m_history.getProjectHistory(m_projFile, hi))
-        m_adjustedBeat = hi.adjustedBeat;
-
     if (!m_bIsPreviewProject)
-        m_history.add(m_projFile, m_uuid, m_adjustedBeat);
+        m_history.add(m_projFile, m_uuid);
     return true;
 }
 
@@ -198,7 +193,7 @@ bool TABProject::saveProject(QString strProjFile, bool bTemp)
     if (!bTemp)
     {
         m_projFile = strProjFile;
-        m_history.add(m_projFile, m_uuid, m_adjustedBeat);
+        m_history.add(m_projFile, m_uuid);
     }
     return true;
 }
@@ -206,7 +201,7 @@ bool TABProject::saveProject(QString strProjFile, bool bTemp)
 bool TABProject::closeProject()
 {
     if(!m_projFile.isEmpty() && !m_bIsPreviewProject)
-        m_history.add(m_projFile, m_uuid, m_adjustedBeat);
+        m_history.add(m_projFile, m_uuid);
 
     TabProjInfo pi = {};
     m_projInfo = pi;

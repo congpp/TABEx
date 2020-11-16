@@ -388,6 +388,9 @@ void QVerticalPaintHandler::onPaint(QPainter *painter, QRect rc)
     QRect rcM = rcTabLine;
     if (m)
     {
+        if (m_ps && *m_ps == PS_FINISHED)
+            painter->setOpacity(0.3);
+
         sz = getFixedImageSize(rcM, m->rcPos);
         rcM.setTop(rcCover.center().ry() - sz.height() / 2);
         //rcM.setTop(rcTabLine.center().ry() - sz.height() / 2);
@@ -627,6 +630,17 @@ QSize QVerticalPaintHandler::getFixedImageSize(QRect &rcPaint, const QRect &rcIm
     int w=rcImg.width();
     int h=rcImg.height();
     int maxWidth = rcPaint.width();
+    int maxHeight = m_szFixedTabItemUser.height();
+    if (maxHeight == 0)
+        maxHeight = m_szFixedTabItem.height();
+
+    //先等比缩放，对齐高度。垂直播放，高度优先
+    if (h > maxHeight)
+    {
+        double dh = h * 1.0 / maxHeight;
+        h = maxHeight;
+        w = int(w / dh);
+    }
 
     //图片比窗口要宽，则使用窗口宽度，但是要调整图片高度
     if (w > maxWidth)
@@ -641,11 +655,5 @@ QSize QVerticalPaintHandler::getFixedImageSize(QRect &rcPaint, const QRect &rcIm
     {
     }
 
-    if (h > m_szFixedTabItem.height())
-    {
-        double d = h * 1.0 / m_szFixedTabItem.height();   //>1
-        h = m_szFixedTabItem.height();
-        w =  int(w / d);
-    }
     return QSize(w, h);
 }

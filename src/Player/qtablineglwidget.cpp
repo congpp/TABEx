@@ -106,6 +106,9 @@ bool QTabLineGLWidget::setPlayingTabLine(int iTabLine, bool bEmitSignal)
         return true;
     }
 
+    if (m_playStatus == PS_FINISHED)
+        m_playStatus = PS_IDLE;
+
     m_iTabLine = iTabLine;
     m_paintHandler->setTabLineIndex(m_iTabLine);
     repaint();
@@ -131,6 +134,11 @@ bool QTabLineGLWidget::playNext(int iVal)
 bool QTabLineGLWidget::playPrev(int iVal)
 {
     m_iTimeCurrent = 0;
+
+    //播放完成，然后往上滚一下滚轮，应该选中最后一个tabLine
+    if (m_playStatus == PS_FINISHED && m_iTabLine == TAB_INST->getTabLineCount() - 1 && iVal == 1)
+        iVal = 0;
+
     return setPlayingTabLine(m_iTabLine-iVal, true);
 }
 

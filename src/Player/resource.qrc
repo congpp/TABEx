@@ -8,5 +8,15 @@
         <file>resource/image/welcome.png</file>
         <file>resource/image/welcome2.png</file>
         <file>resource/image/shadow.png</file>
+        <file>resource/image/btn_close.png</file>
+        <file>resource/image/btn_max.png</file>
+        <file>resource/image/btn_min.png</file>
+        <file>resource/image/btn_restore.png</file>
+        <file>resource/image/logo_26.png</file>
+        <file>resource/image/btn_open.png</file>
+        <file>resource/image/btn_next.png</file>
+        <file>resource/image/btn_play.png</file>
+        <file>resource/image/btn_prev.png</file>
+        <file>resource/image/btn_pause.png</file>
     </qresource>
 </RCC>

@@ -9,7 +9,6 @@ struct ProjectHistoryInfo
     QString filePath;
     QString uuid;
     QString timeAccess;
-    int adjustedBeat = 0;
 };
 
 typedef QList<ProjectHistoryInfo> ProjectHisotryInfoList;
@@ -20,7 +19,7 @@ public:
     ProjectHistory();
     ~ProjectHistory() override;
 
-    bool add(QString projFile, QString uuid, int adjustedBeat);
+    bool add(QString projFile, QString uuid);
 
     bool save();
     bool open();

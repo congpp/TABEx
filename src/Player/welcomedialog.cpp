@@ -13,6 +13,7 @@ WelcomeDialog::WelcomeDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(":/image/resource/logo.ico"));
+    setWindowTitle(tr("Recent project(s)"));
 
     this->setWindowFlag(Qt::FramelessWindowHint);
     this->setAttribute(Qt::WA_TranslucentBackground);

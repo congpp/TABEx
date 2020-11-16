@@ -17,9 +17,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setAcceptDrops(true);
     setWindowFlag(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_Hover);
+    setMouseTracking(true);
 
-
-    setWindowTitle(tr("Player"));
+    updateWindowTitle();
 
     QStringList nums;
     nums << "Auto" << "100" << "200" << "300";
@@ -55,7 +56,7 @@ void MainWindow::initUI()
     ui->progress->setRange(0, TAB_INST->getTabLineCount()-1);
     ui->progress->setValue(0);
 
-    setWindowTitle(QFileUtil::getFileName(TAB_INST->currentProject()));
+    updateWindowTitle();
 }
 
 void MainWindow::wheelEvent(QWheelEvent *event)
@@ -88,10 +89,55 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 }
 
-void MainWindow::setWindowTitle(QString strTitle)
+void MainWindow::updateWindowTitle()
 {
-    QMainWindow::setWindowTitle(strTitle);
-    ui->labelTitle->setText(strTitle);
+    auto proj = TAB_INST;
+    QString title = QFileUtil::getFileName(proj->currentProject());
+    if (title.isEmpty())
+    {
+        title = tr("Player");
+    }
+    else
+    {
+        QString singer = proj->getSingerName();
+        if (singer.isEmpty())
+            singer = tr("Unknow");
+
+        QString song = proj->getMusicTitle();
+        if (song.isEmpty())
+            song = tr("Unknow");
+
+        title = singer + " - " + song + " (" + title + ")";
+    }
+
+    QMainWindow::setWindowTitle(title);
+    ui->labelTitle->setText(title);
+}
+
+void MainWindow::setWindowState(Qt::WindowStates st)
+{
+    static const QString maxBtnStyle("QPushButton {"
+                        "    border: 0px;"
+                        "    width: 26px;"
+                        "	background-color: rgba(255, 255, 255, 0);"
+                        "	border-image: url(:/image/resource/image/%1.png) 0 52 0 0;"
+                        "}"
+                        "QPushButton:hover {"
+                        "	background-color: rgba(255, 255, 255, 0);"
+                        "	border-image: url(:/image/resource/image/%1.png) 0 26 0 26;"
+                        "}"
+                        "QPushButton:pressed {"
+                        "	background-color: rgba(255, 255, 255, 0);"
+                        "	border-image: url(:/image/resource/image/%1.png) 0 0 0 52;"
+                        "} "
+                        "QPushButton:disabled {"
+                        "	background-color: rgba(255, 255, 255, 0);"
+                        "}");
+
+    ui->centralWidget->layout()->setMargin((st & Qt::WindowNoState) ? 8 : 0);
+    ui->pushButtonMax->setStyleSheet(maxBtnStyle.arg((st & Qt::WindowMaximized) ? "btn_restore" : "btn_max"));
+    ui->widgetTitle->setVisible((st & Qt::WindowFullScreen) == 0);
+    QMainWindow::setWindowState(st);
 }
 
 bool MainWindow::openProject(QString strProj)
@@ -138,11 +184,11 @@ void MainWindow::on_btnPlay_clicked(bool checked)
     if (ui->widgetPlayer->getPlayStatus() == PS_PLAYING)
     {
         ui->widgetPlayer->pause();
-        ui->btnPlay->setText(tr("Play"));
+        updatePlayButton(true);
     }
     else
     {
-        ui->btnPlay->setText(tr("Pause"));
+        updatePlayButton(false);
         ui->widgetPlayer->play();
     }
 }
@@ -218,7 +264,7 @@ void MainWindow::onPlayerTabLineChanged(int iTabLine)
     //finshed
     if (-1 == iTabLine)
     {
-        ui->btnPlay->setText(tr("Play"));
+        updatePlayButton(true);
         return;
     }
 
@@ -229,7 +275,6 @@ void MainWindow::on_actionExit_triggered()
 {
     QApplication::exit(0);
 }
-
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
@@ -255,36 +300,61 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        QRect rc = ui->labelTitle->rect();
-        QPoint ptLT = ui->widgetTitle->mapToGlobal(rc.topLeft());
-        QPoint ptRB = ui->widgetTitle->mapToGlobal(rc.bottomRight());
-        rc = QRect(ptLT, ptRB);
-        QPoint pt = event->globalPos();
-        qDebug() << rc << pt;
-        if (rc.contains(pt))
+        if (m_hitTest != HT_C)
         {
-            m_dragging = true;
-            m_dragPosition = event->globalPos() - this->pos();
-            event->accept();
+            m_resizing = true;
+            m_resizePosition = event->globalPos();
+            m_resizeBeginRect = geometry();
+            //qDebug() << "m_resizePosition = " << m_resizePosition;
+        }
+        else
+        {
+            QRect rc = ui->labelTitle->rect();
+            QPoint ptLT = ui->widgetTitle->mapToGlobal(rc.topLeft());
+            QPoint ptRB = ui->widgetTitle->mapToGlobal(rc.bottomRight());
+            rc = QRect(ptLT, ptRB);
+            QPoint pt = event->globalPos();
+            //qDebug() << rc << pt;
+            if (rc.contains(pt))
+            {
+                m_dragging = true;
+                m_dragPosition = event->globalPos() - this->pos();
+                event->accept();
+            }
         }
     }
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event)
 {
-    if (m_dragging && (event->buttons() == Qt::LeftButton))
+    if (event->buttons() == Qt::LeftButton)
     {
-        move(event->globalPos() - m_dragPosition);
-        event->accept();
+        if (m_dragging)
+        {
+            move(event->globalPos() - m_dragPosition);
+            event->accept();
+            return;
+        }
+        else if (m_resizing)
+        {
+            resizeRegion(event);
+            event->accept();
+            return;
+        }
     }
+
+    if (!m_resizing)
+        hitTest(event);
 }
 
 void MainWindow::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (m_dragging)
+    //qDebug() << "mouseReleaseEvent";
+    if (m_dragging || m_resizing)
     {
         event->accept();
-        m_dragging=false;
+        m_dragging = false;
+        m_resizing = false;
     }
 }
 
@@ -315,15 +385,13 @@ void MainWindow::on_pushButtonClose_clicked()
 
 void MainWindow::on_pushButtonMax_clicked()
 {
-    static Qt::WindowStates wsOld = Qt::WindowNoState;
     Qt::WindowStates ws = windowState();
     if (ws == Qt::WindowMaximized)
     {
-        ws = wsOld;
+        ws = Qt::WindowNoState;
     }
     else
     {
-        wsOld = ws;
         ws = Qt::WindowMaximized;
     }
 
@@ -333,4 +401,140 @@ void MainWindow::on_pushButtonMax_clicked()
 void MainWindow::on_pushButtonMin_clicked()
 {
     setWindowState(Qt::WindowMinimized);
+}
+
+void MainWindow::hitTest(QMouseEvent *event)
+{
+    Qt::WindowStates st = windowState();
+    if ((Qt::WindowFullScreen & st) || (Qt::WindowMaximized & st))
+    {
+        m_hitTest = HT_C;
+        m_resizing = false;
+        return;
+    }
+
+    QRect rc = geometry();
+    int l=rc.left(), t=rc.top(), w=rc.width(), h=rc.height(), r=DRAG_FRAME_SIZE;
+    struct HitTestInfo
+    {
+        QRect rc;
+        HitTest ht;
+        Qt::CursorShape cs;
+    } htis[] =
+    {
+
+    /*LT*/{QRect(l, t, r, r), HT_LT, Qt::SizeFDiagCursor},
+    /*RT*/{QRect(l + w - r, t, r, r), HT_RT, Qt::SizeBDiagCursor},
+    /*LB*/{QRect(l, t + h - r, r, r), HT_LB, Qt::SizeBDiagCursor},
+    /*RB*/{QRect(l + w - r, t + h - r, r, r), HT_RB, Qt::SizeFDiagCursor},
+    /*L */{QRect (l, t + r, r, h - r - r), HT_L, Qt::SizeHorCursor},
+    /*T */{QRect (l + r, t, w - r - r, r), HT_T, Qt::SizeVerCursor},
+    /*R */{QRect (l + w - r, t + r, r, h - r - r), HT_R, Qt::SizeHorCursor},
+    /*B */{QRect (l + r, t + h - r, w - r - r, r), HT_B, Qt::SizeVerCursor},
+    /*C */{QRect (l + r, t + r, w - r - r, h - r - r), HT_C, Qt::ArrowCursor}
+    };
+
+    //计算四个方向的边距，记录鼠标状态
+    QPoint pt = event->globalPos();
+    for (auto hti : htis)
+    if (hti.rc.contains(pt))
+    {
+        m_hitTest = hti.ht;
+        setCursor(hti.cs);
+    }
+}
+
+void MainWindow::resizeRegion(QMouseEvent *event)
+{
+    if (!m_resizing)
+        return;
+
+    QRect rc = m_resizeBeginRect;
+    int dx = event->globalX() - m_resizePosition.rx();
+    int dy = event->globalY() - m_resizePosition.ry();
+    int minw = minimumWidth();
+    int minh = minimumHeight();
+    switch (m_hitTest)
+    {
+    case HT_LT:
+         rc.adjust(dx,dy,0,0);
+         if (rc.width() < minw) rc.setLeft(m_resizeBeginRect.right() - minw);
+         if (rc.height() < minh) rc.setHeight(m_resizeBeginRect.bottom() - minh);
+        break;
+    case HT_RT:
+         rc.adjust(0,dy,dx,0);
+         if (rc.width() < minw) rc.setRight(m_resizeBeginRect.left() + minw);
+         if (rc.height() < minh) rc.setHeight(m_resizeBeginRect.bottom() - minh);
+        break;
+    case HT_LB:
+         rc.adjust(dx,0,0,dy);
+         if (rc.width() < minw) rc.setLeft(m_resizeBeginRect.right() - minw);
+         if (rc.height() < minh) rc.setBottom(m_resizeBeginRect.top() + minh);
+        break;
+    case HT_RB:
+         rc.adjust(0,0,dx,dy);
+         if (rc.width() < minw) rc.setRight(m_resizeBeginRect.left() + minw);
+         if (rc.height() < minh) rc.setBottom(m_resizeBeginRect.top() + minh);
+        break;
+    case HT_L:
+         rc.adjust(dx,0,0,0);
+         if (rc.width() < minw) rc.setLeft(m_resizeBeginRect.right() - minw);
+        break;
+    case HT_T:
+         rc.adjust(0,dy,0,0);
+         if (rc.height() < minh) rc.setTop(m_resizeBeginRect.bottom() - minh);
+        break;
+    case HT_R:
+         rc.adjust(0,0,dx,0);
+         if (rc.width() < minw) rc.setRight(m_resizeBeginRect.left() + minw);
+        break;
+    case HT_B:
+         rc.adjust(0,0,0,dy);
+         if (rc.height() < minh) rc.setBottom(m_resizeBeginRect.top() + minh);
+        break;
+    default: break;
+    }
+
+    //qDebug() << event->globalPos() << m_resizePosition << dx << dy << rc << m_hitTest;
+    setGeometry(rc);
+}
+
+void MainWindow::updatePlayButton(bool bPlay)
+{
+    static const QString playButtonStyle="QPushButton {"
+                                         "    border: 0px;"
+                                         "    background-color: rgba(255, 255, 255, 0);"
+                                         "    border-image: url(:/image/resource/image/%1.png) 0 52 0 0;"
+                                         "}"
+                                         "QPushButton:hover {"
+                                         "    background-color: rgba(255, 255, 255, 0);"
+                                         "    border-image: url(:/image/resource/image/%1.png) 0 26 0 26;"
+                                         "}"
+                                         "QPushButton:pressed {"
+                                         "    background-color: rgba(255, 255, 255, 0);"
+                                         "    border-image: url(:/image/resource/image/%1.png) 0 0 0 52;"
+                                         "} "
+                                         "QPushButton:disabled {"
+                                         "    background-color: rgba(255, 255, 255, 0);"
+                                         "}";
+
+    ui->btnPlay->setStyleSheet(playButtonStyle.arg(bPlay ? "btn_play" : "btn_pause"));
+}
+
+bool MainWindow::event(QEvent *event)
+{
+    if (event->type() == QEvent::HoverMove)
+    {
+        QHoverEvent *hoverEvent = static_cast<QHoverEvent *>(event);
+        QMouseEvent mouseEvent(QEvent::MouseMove, hoverEvent->pos(),
+                               Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+        mouseMoveEvent(&mouseEvent);
+    }
+
+    return QMainWindow::event(event);
+}
+
+void MainWindow::on_pushButtonOpen_clicked()
+{
+    on_actionOpen_triggered();
 }

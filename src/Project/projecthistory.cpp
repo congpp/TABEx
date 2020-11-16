@@ -9,7 +9,7 @@
 #include <QDateTime>
 
 const QString HISTORY_FILE_PATH("history.json");
-const int MAX_HISTROY_SIZE = 100;
+const int MAX_HISTROY_SIZE = 10;
 
 ProjectHistory::ProjectHistory()
 {
@@ -21,7 +21,7 @@ ProjectHistory::~ProjectHistory()
     save();
 }
 
-bool ProjectHistory::add(QString projFile, QString uuid, int adjustedBeat)
+bool ProjectHistory::add(QString projFile, QString uuid)
 {
     for (auto it = m_history.begin(); it != m_history.end();)
     {
@@ -35,7 +35,6 @@ bool ProjectHistory::add(QString projFile, QString uuid, int adjustedBeat)
     hi.filePath = projFile;
     hi.uuid = uuid;
     hi.timeAccess = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    hi.adjustedBeat = adjustedBeat;
     m_history.push_front(hi);
 
     while (m_history.size() > MAX_HISTROY_SIZE)
@@ -62,7 +61,6 @@ bool ProjectHistory::save()
         obj.insert("filePath", it.filePath);
         obj.insert("uuid", it.uuid);
         obj.insert("timeAccess", it.timeAccess);
-        obj.insert("adjustedBeat", it.adjustedBeat);
         arr.append(obj);
     }
     jsDoc.setArray(arr);
@@ -99,12 +97,17 @@ bool ProjectHistory::open()
 
         hi.uuid = obj.take("uuid").toString();
         hi.timeAccess = obj.take("timeAccess").toString();
-        hi.adjustedBeat = obj.take("adjustedBeat").toInt();
         m_history.push_back(hi);
 
         if (m_history.size() > MAX_HISTROY_SIZE)
             break;
     }
+
+    //unique
+    auto it = std::unique(m_history.begin(), m_history.end(), [&](ProjectHistoryInfo& l, ProjectHistoryInfo& r)->bool{
+        return l.filePath.compare(r.filePath, Qt::CaseInsensitive) == 0;
+    });
+    m_history.erase(it, m_history.end());
 
     return true;
 }

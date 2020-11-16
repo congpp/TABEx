@@ -16,6 +16,9 @@
     <height>680</height>
    </size>
   </property>
+  <property name="mouseTracking">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -127,8 +130,15 @@ QPushButton:disabled {
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="styleSheet">
+             <string notr="true">background-image: url(:/image/resource/image/logo_26.png);
+background-repeat: no;</string>
+            </property>
             <property name="text">
              <string>TextLabel</string>
+            </property>
+            <property name="indent">
+             <number>32</number>
             </property>
            </widget>
           </item>
@@ -136,18 +146,41 @@ QPushButton:disabled {
            <widget class="QPushButton" name="pushButtonMin">
             <property name="minimumSize">
              <size>
-              <width>32</width>
-              <height>0</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>32</width>
-              <height>16777215</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: 0px;
+    width: 26px;
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_min.png) 0 52 0 0;
+}
+ 
+QPushButton:hover {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_min.png) 0 26 0 26;
+}
+ 
+QPushButton:pressed {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_min.png) 0 0 0 52;
+}
+ 
+QPushButton:disabled {
+	background-color: rgba(255, 255, 255, 0);
+}
+</string>
+            </property>
             <property name="text">
-             <string>-</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -155,18 +188,41 @@ QPushButton:disabled {
            <widget class="QPushButton" name="pushButtonMax">
             <property name="minimumSize">
              <size>
-              <width>32</width>
-              <height>0</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>32</width>
-              <height>16777215</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: 0px;
+    width: 26px;
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_max.png) 0 52 0 0;
+}
+ 
+QPushButton:hover {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_max.png) 0 26 0 26;
+}
+ 
+QPushButton:pressed {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_max.png) 0 0 0 52;
+}
+ 
+QPushButton:disabled {
+	background-color: rgba(255, 255, 255, 0);
+}
+</string>
+            </property>
             <property name="text">
-             <string>[ ]</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -174,18 +230,41 @@ QPushButton:disabled {
            <widget class="QPushButton" name="pushButtonClose">
             <property name="minimumSize">
              <size>
-              <width>42</width>
-              <height>0</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>42</width>
-              <height>16777215</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: 0px;
+    width: 26px;
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_close.png) 0 52 0 0;
+}
+ 
+QPushButton:hover {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_close.png) 0 26 0 26;
+}
+ 
+QPushButton:pressed {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_close.png) 0 0 0 52;
+}
+ 
+QPushButton:disabled {
+	background-color: rgba(255, 255, 255, 0);
+}
+</string>
+            </property>
             <property name="text">
-             <string>x</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -232,21 +311,78 @@ background-color: rgba(0, 0, 0, 64);
            <number>9</number>
           </property>
           <item>
+           <widget class="QPushButton" name="pushButtonOpen">
+            <property name="maximumSize">
+             <size>
+              <width>26</width>
+              <height>26</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: 0px;
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_open.png) 0 52 0 0;
+}
+ 
+QPushButton:hover {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_open.png) 0 26 0 26;
+}
+ 
+QPushButton:pressed {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_open.png) 0 0 0 52;
+}
+ 
+QPushButton:disabled {
+	background-color: rgba(255, 255, 255, 0);
+}
+</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btnLeft">
             <property name="minimumSize">
              <size>
-              <width>0</width>
-              <height>0</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: 0px;
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_prev.png) 0 52 0 0;
+}
+ 
+QPushButton:hover {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_prev.png) 0 26 0 26;
+}
+ 
+QPushButton:pressed {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_prev.png) 0 0 0 52;
+}
+ 
+QPushButton:disabled {
+	background-color: rgba(255, 255, 255, 0);
+}
+</string>
+            </property>
             <property name="text">
-             <string>&lt;&lt;</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -254,18 +390,40 @@ background-color: rgba(0, 0, 0, 64);
            <widget class="QPushButton" name="btnPlay">
             <property name="minimumSize">
              <size>
-              <width>0</width>
-              <height>0</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: 0px;
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_play.png) 0 52 0 0;
+}
+ 
+QPushButton:hover {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_play.png) 0 26 0 26;
+}
+ 
+QPushButton:pressed {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_play.png) 0 0 0 52;
+}
+ 
+QPushButton:disabled {
+	background-color: rgba(255, 255, 255, 0);
+}
+</string>
+            </property>
             <property name="text">
-             <string>Play</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -273,18 +431,40 @@ background-color: rgba(0, 0, 0, 64);
            <widget class="QPushButton" name="btnRight">
             <property name="minimumSize">
              <size>
-              <width>0</width>
-              <height>0</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>26</width>
+              <height>26</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: 0px;
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_next.png) 0 52 0 0;
+}
+ 
+QPushButton:hover {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_next.png) 0 26 0 26;
+}
+ 
+QPushButton:pressed {
+	background-color: rgba(255, 255, 255, 0);
+	border-image: url(:/image/resource/image/btn_next.png) 0 0 0 52;
+}
+ 
+QPushButton:disabled {
+	background-color: rgba(255, 255, 255, 0);
+}
+</string>
+            </property>
             <property name="text">
-             <string>&gt;&gt;</string>
+             <string/>
             </property>
            </widget>
           </item>

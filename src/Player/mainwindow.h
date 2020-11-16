@@ -26,14 +26,17 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
+
     virtual void dragEnterEvent(QDragEnterEvent *event) override;
     //virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
     //virtual void dragMoveEvent(QDragMoveEvent *event) override;
     virtual void dropEvent(QDropEvent *event) override;
 
     virtual void paintEvent(QPaintEvent *event) override;
+    virtual bool event(QEvent *event) override;
 
-    void setWindowTitle(QString strTitle);
+    void updateWindowTitle();
+    void setWindowState(Qt::WindowStates st);
 public slots:
     bool openProject(QString strProj);
 
@@ -52,11 +55,28 @@ private slots:
     void on_pushButtonMax_clicked();
     void on_pushButtonMin_clicked();
 
+    void on_pushButtonOpen_clicked();
+
+protected:
+    void hitTest(QMouseEvent *event);
+    void resizeRegion(QMouseEvent *event);
+    void updatePlayButton(bool bPlay);
 private:
     Ui::MainWindow *ui;
 
     bool m_dragging = false;
     QPoint m_dragPosition;
+
+    const int DRAG_FRAME_SIZE = 8;
+    bool m_resizing = false;
+    QPoint m_resizePosition;
+    QRect  m_resizeBeginRect;
+    enum HitTest
+    {
+        HT_LT, HT_T, HT_RT,
+        HT_L,  HT_C, HT_R,
+        HT_LB, HT_B, HT_RB,
+    }m_hitTest = HT_C;
 
     UserTpfConfig cfg;
 };
