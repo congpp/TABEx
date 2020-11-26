@@ -15,12 +15,20 @@ QLineHeightComboBox::~QLineHeightComboBox()
 
 void QLineHeightComboBox::setHeight(int h)
 {
-    if (h < m_pValidator->bottom())
-        h = m_pValidator->bottom();
-    else if (h > m_pValidator->top())
-        h = m_pValidator->top();
+    if (h == 0)
+    {
+        this->setCurrentIndex(0);
+    }
+    else
+    {
+        if (h < m_pValidator->bottom())
+            h = m_pValidator->bottom();
+        else if (h > m_pValidator->top())
+            h = m_pValidator->top();
 
-    this->lineEdit()->setText(QString::asprintf("%d", h));
+        this->lineEdit()->setText(QString::asprintf("%d", h));
+    }
+
     emit signalLineHeightChanged(h);
 }
 

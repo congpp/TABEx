@@ -133,6 +133,10 @@ protected:
     bool loadImage(QString strFileName, int index = -1);
 
     QString getTempPath(bool bCreate=true);
+
+    //清理工作目录（有些异常结束的进程，可能来不及删除临时目录，那么在下一次启动的时候就清除掉他们）
+    void cleanUpWorkingPath();
+    void makeFlagFile(QString strPath);
 private:
     QString m_uuid;
     QString m_projFile;
@@ -149,6 +153,8 @@ private:
     int m_adjustedBeat = 0; //用来暂时调速
 
     bool m_bIsPreviewProject = false;   //只是用来预览的工程
+
+    QFile m_flagFile;   //每个临时目录都有一个标记文件
 };
 
 #define TAB_INST TABProject::getInstance()

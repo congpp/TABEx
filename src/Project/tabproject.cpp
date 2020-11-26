@@ -9,18 +9,16 @@
 #include <QTextStream>
 #include <QUuid>
 
+const static QString TEMP_DIR_FLAG_FILE(".dir_in_used__");
+
 TABProject::TABProject()
 {
+    cleanUpWorkingPath();
 }
 
 TABProject::~TABProject()
 {
     closeProject();
-
-    //clean up temp dir
-    QDir dirTmp(getTempPath(false));
-    if (!dirTmp.path().isEmpty())
-        dirTmp.removeRecursively();
 }
 
 TABProject *TABProject::getInstance()
@@ -58,6 +56,8 @@ bool TABProject::createPorject(bool restoreLastProject)
     pi.strWorkingPath = strPath;
 
     m_projInfo = pi;
+
+    makeFlagFile(strPath);
     return true;
 }
 
@@ -83,6 +83,8 @@ bool TABProject::openProject(QString strProjFile)
 
     if (!m_bIsPreviewProject)
         m_history.add(m_projFile, m_uuid);
+
+    makeFlagFile(tempPath);
     return true;
 }
 
@@ -91,7 +93,7 @@ bool TABProject::openJson(QString strJsonFile)
     if (strJsonFile.isEmpty())
         return false;
 
-    closeProject();
+    //closeProject();
 
     //read config from json
     QFile file(strJsonFile);
@@ -209,6 +211,15 @@ bool TABProject::closeProject()
     m_imgPreviewMap.clear();
     m_projFile.clear();
     m_tlModel.notifyChanged(0);
+    m_flagFile.close();
+
+    //clean up temp dir
+    QString tempPath = getTempPath(false);
+    if (!tempPath.isEmpty())
+    {
+        QDir dirTmp(tempPath);
+        dirTmp.removeRecursively();
+    }
     return true;
 }
 
@@ -910,5 +921,28 @@ QString TABProject::getTempPath(bool bCreate)
         return "";
     }
     return strPath;
+}
+
+void TABProject::cleanUpWorkingPath()
+{
+    QString rootPath = QDir::homePath() + PROJ_PATH_ROOT;
+    QDir tempPath(rootPath);
+    QStringList dirs = tempPath.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
+    for (auto dir : dirs)
+    {
+        QString subdir = rootPath + dir + "/";
+        if (QFile::remove(subdir + TEMP_DIR_FLAG_FILE))
+        {
+            QDir d(subdir);
+            d.removeRecursively();
+        }
+    }
+}
+
+void TABProject::makeFlagFile(QString strPath)
+{
+    m_flagFile.setFileName(strPath + TEMP_DIR_FLAG_FILE);
+    m_flagFile.open(QFile::ReadWrite);
+
 }
 
