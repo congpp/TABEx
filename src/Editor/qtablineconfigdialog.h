@@ -23,25 +23,32 @@ public:
     ~QTabLineConfigDialog();
 
     void setTabLine(TabLinePtr ptrTabLine);
+    void setTabLine(int index);
 
     int getNewTabLinePosition();
 public slots:
     void accept();
+    void reject();
     void updateInfo();
 
 protected:
     void initRadio(TabLineConfigMode mode);
-    
+    void checkModification();
 private slots:
     void on_lineEditSections_textChanged(const QString &arg1);
+
+    void on_pushButtonPrev_clicked();
+    void on_pushButtonSave_clicked();
+    void on_pushButtonNext_clicked();
 
 private:
     Ui::QTabLineConfigDialog *ui;
 
     TabLinePtr m_ptrTabLine;
-    TabLinePtr  m_tlBefore;
+    TabLinePtr m_tlBefore;
+    int        m_tlIndex = -1;
 
-    static int m_lastSetions;
+    static double m_lastSetions;
 
     TabLineConfigMode m_tlcm;
     int m_newTabLinePosition = -1;

@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
-    <height>354</height>
+    <width>620</width>
+    <height>408</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Project Config</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
@@ -91,8 +91,8 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="maximumSize">
             <size>
-             <width>100</width>
-             <height>68</height>
+             <width>9999</width>
+             <height>9999</height>
             </size>
            </property>
            <property name="text">
@@ -109,7 +109,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QPlainTextEdit" name="textEditDesc">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -123,7 +123,7 @@ p, li { white-space: pre-wrap; }
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>68</height>
+             <height>16777215</height>
             </size>
            </property>
           </widget>
@@ -133,29 +133,40 @@ p, li { white-space: pre-wrap; }
       </layout>
      </item>
      <item>
-      <widget class="QImageButton" name="btnCoverImg">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>128</width>
-         <height>128</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>128</width>
-         <height>128</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Cover</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QImageButton" name="btnCoverImg">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>128</width>
+           <height>128</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>128</width>
+           <height>128</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Cover</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonSearchCover">
+         <property name="text">
+          <string>试试手气</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -229,8 +240,8 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="maximumSize">
             <size>
-             <width>100</width>
-             <height>68</height>
+             <width>10000</width>
+             <height>10000</height>
             </size>
            </property>
            <property name="text">
@@ -247,7 +258,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QPlainTextEdit" name="textEditSingerInfo">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -261,7 +272,7 @@ p, li { white-space: pre-wrap; }
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>68</height>
+             <height>16777215</height>
             </size>
            </property>
           </widget>
@@ -271,29 +282,40 @@ p, li { white-space: pre-wrap; }
       </layout>
      </item>
      <item>
-      <widget class="QImageButton" name="btnSingerImg">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>128</width>
-         <height>128</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>128</width>
-         <height>128</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Singer</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QImageButton" name="btnSingerImg">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>128</width>
+           <height>128</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>128</width>
+           <height>128</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Singer</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonSearchSinger">
+         <property name="text">
+          <string>试试手气</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

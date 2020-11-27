@@ -24,15 +24,31 @@ static const QString PLAYER_NAME("Player");
 
 static const QColor CLR_FG(0, 162, 232, 128);
 
+
+#define DoubleEqual(l, r) (((l) > (r)) ? ((l) - (r) < 1E-5) : ( (r) - (l) < 1E-5))
+
+
 //TabLine 乐谱的行，包含一到多个小节
 //把一整张乐谱分割成N个TabLine，分割的时候把跳转处理好，就可以从头到尾播放了
 struct TabLine
 {
-    int     sections = 0;   //这行有多少个小节
+    double  sections = 0;   //这行有多少个小节，改成小数了，因为某行可能存在半个小节之类的
     QString strImg;     //图片路径
     QRect   rcPos;      //图片区域
     QRect   rcOffset;   //显示时的偏移
     QRect   rcBlur;     //挡住一部分区域，不需要显示，unused
+
+    bool operator==(const TabLine& r)
+    {
+        return DoubleEqual(sections, r.sections) && strImg == r.strImg && rcPos == r.rcPos
+                && rcOffset == r.rcOffset && rcBlur == r.rcBlur;
+    }
+
+    bool operator!=(const TabLine& r)
+    {
+        return !DoubleEqual(sections, r.sections) || strImg != r.strImg || rcPos != r.rcPos
+                || rcOffset != r.rcOffset || rcBlur != r.rcBlur;
+    }
 };
 
 typedef QSharedPointer<TabLine> TabLinePtr;

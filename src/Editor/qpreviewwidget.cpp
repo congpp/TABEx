@@ -5,6 +5,18 @@
 
 QPreviewWidget::QPreviewWidget(QWidget *parent) : QListView(parent)
 {
+    const QString PopupMenuActionName[PMA_COUNT] =
+    {
+        tr("Add image"),
+        tr("Insert image before this"),
+        tr("Insert image after this"),
+        tr("Remove"),
+        tr("Move up"),
+        tr("Move down"),
+        tr("Export"),
+        tr("Relpace"),
+    };
+
     for (int i=0; i<PMA_COUNT; ++i)
     {
         QAction* pAct = new QAction(PopupMenuActionName[i], this);
@@ -26,31 +38,33 @@ void QPreviewWidget::onActionToggled(bool)
     if (!pAct)
         return;
 
+    static const QString filters(tr("Image Files (*.bmp *.jpg *.jpeg *.png *.gif)"));
+
     PopupMenuActionIndex pi = static_cast<PopupMenuActionIndex>(pAct->data().toInt());
     qDebug() << "onActionToggled " << pi;
     switch (pi)
     {
     case PMA_ADD_IMG:
     {
-        QString strImg = QFileDialog::getOpenFileName(this,
-            tr("Add image"), QDir::currentPath(), tr("Image Files (*.bmp *.jpg *.jpeg *.png)"));
-        TAB_INST->addImage(strImg, &strImg);
+        QStringList imgs = QFileDialog::getOpenFileNames(this, tr("Add image"), "", filters);
+        for (auto img : imgs)
+            TAB_INST->addImage(img, nullptr);
         //emit newImageAdded(strImg, -1);
         break;
     }
     case PMA_INSERT_BEFORE:
     {
-        QString strImg = QFileDialog::getOpenFileName(this,
-            tr("Add image"), QDir::currentPath(), tr("Image Files (*.bmp *.jpg *.jpeg *.png)"));
-        TAB_INST->insertImage(strImg, m_lastMenuClickedIndex, &strImg);
+        QStringList imgs = QFileDialog::getOpenFileNames(this, tr("Add image"), "", filters);
+        for (auto img : imgs)
+            TAB_INST->insertImage(img, m_lastMenuClickedIndex, nullptr);
         //emit newImageAdded(strImg, m_lastMenuClickedIndex);
         break;
     }
     case PMA_INSERT_AFTER:
     {
-        QString strImg = QFileDialog::getOpenFileName(this,
-            tr("Add image"), QDir::currentPath(), tr("Image Files (*.bmp *.jpg *.jpeg *.png)"));
-        TAB_INST->insertImage(strImg, m_lastMenuClickedIndex + 1, &strImg);
+        QStringList imgs = QFileDialog::getOpenFileNames(this, tr("Add image"), "", filters);
+        for (auto img : imgs)
+            TAB_INST->insertImage(img, m_lastMenuClickedIndex + 1, nullptr);
         //emit newImageAdded(strImg, m_lastMenuClickedIndex + 1);
         break;
     }
@@ -82,6 +96,77 @@ void QPreviewWidget::onActionToggled(bool)
 
         int r = li.first().row();
         TAB_INST->moveImage(r, r+1);
+        break;
+    }
+    case PMA_EXPORT:
+    {
+        QModelIndexList li = selectedIndexes();
+        QString saveDir = QFileDialog::getExistingDirectory(this);
+        if (saveDir.isEmpty())
+            break;
+
+        bool bYesToAll = false;
+        bool bNotToAll = false;
+        QString songTitle = TAB_INST->getMusicTitle();
+        if (songTitle.isEmpty())
+            songTitle = QFileUtil::getFileNameNoExt(TAB_INST->currentProject());
+
+        QString firstSelected;
+        for (auto it : li)
+        {
+            QString pathFrom = TAB_INST->getImageTempPath(it.row());
+            QString pathTo = saveDir + "/" + songTitle + "_" + QFileUtil::getFileName(pathFrom);
+            if (QFile::exists(pathTo))
+            {
+                if (!bYesToAll && !bNotToAll)
+                {
+                    int ret = QMessageBox::warning(this, tr("Warning"),
+                                                   tr("File already exists: \n[") + pathTo + tr("]\nDo you want to replace it anyway?"),
+                                                   QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll,
+                                                   QMessageBox::Yes);
+                    bYesToAll = ret == QMessageBox::YesToAll;
+                    bNotToAll = ret == QMessageBox::NoToAll;
+                    if (ret == QMessageBox::No)
+                        continue;
+                }
+
+                if (bNotToAll)
+                    continue;
+
+                QFile::remove(pathTo);
+            }
+
+            if (!QFile::copy(pathFrom, pathTo))
+            {
+                QMessageBox::critical(this, tr("Cannot explort image"),
+                                      tr("Cannot export image to path:\r\n[") + pathTo + tr("]\r\nPlease make sure you have enough access right."));
+                break;
+            }
+            if (firstSelected.isEmpty())
+                firstSelected = pathTo;
+        }
+
+#ifdef _MSC_VER
+        if (!firstSelected.isEmpty())
+        {
+            QProcess proc;
+            proc.setProgram("explorer");
+            QString arg = " /select,\"" + firstSelected.replace('/', '\\') + "\"";
+            proc.setNativeArguments(arg);
+            proc.startDetached();
+        }
+#endif
+        break;
+    }
+    case PMA_REPLACE:
+    {
+        QModelIndexList li = selectedIndexes();
+        if (li.isEmpty() || li.size() > 1)
+            break;
+
+        QString img = QFileDialog::getOpenFileName(this, tr("Add image"), "", filters);
+        int r = li.first().row();
+        TAB_INST->replaceImage(r, img);
         break;
     }
     case PMA_COUNT:
@@ -125,6 +210,7 @@ void QPreviewWidget::contextMenuEvent(QContextMenuEvent *event)
     }
     else
     {
+        int selectedCount = selectedIndexes().size();
         int i = indexAt(event->pos()).row();
         m_lastMenuClickedIndex = i;
         qDebug() << "contextMenuEvent item " << i;
@@ -137,31 +223,52 @@ void QPreviewWidget::contextMenuEvent(QContextMenuEvent *event)
 
         else if (i == 0)
         {
-            pMenu->addAction(m_actions[PMA_MOVE_DOWN]);
-            pMenu->addSeparator();
+            if (selectedCount == 1)
+            {
+                pMenu->addAction(m_actions[PMA_MOVE_DOWN]);
+                pMenu->addSeparator();
+            }
             pMenu->addAction(m_actions[PMA_INSERT_BEFORE]);
             pMenu->addAction(m_actions[PMA_INSERT_AFTER]);
             pMenu->addSeparator();
             pMenu->addAction(m_actions[PMA_DELETE]);
+            pMenu->addSeparator();
+            pMenu->addAction(m_actions[PMA_EXPORT]);
+            if (selectedCount == 1)
+                pMenu->addAction(m_actions[PMA_REPLACE]);
         }
         else if (i == itemCount - 1)
         {
-            pMenu->addAction(m_actions[PMA_MOVE_UP]);
-            pMenu->addSeparator();
+            if (selectedCount == 1)
+            {
+                pMenu->addAction(m_actions[PMA_MOVE_UP]);
+                pMenu->addSeparator();
+            }
             pMenu->addAction(m_actions[PMA_INSERT_BEFORE]);
             pMenu->addAction(m_actions[PMA_INSERT_AFTER]);
             pMenu->addSeparator();
             pMenu->addAction(m_actions[PMA_DELETE]);
+            pMenu->addSeparator();
+            pMenu->addAction(m_actions[PMA_EXPORT]);
+            if (selectedCount == 1)
+                pMenu->addAction(m_actions[PMA_REPLACE]);
         }
         else
         {
-            pMenu->addAction(m_actions[PMA_MOVE_UP]);
-            pMenu->addAction(m_actions[PMA_MOVE_DOWN]);
-            pMenu->addSeparator();
+            if (selectedCount == 1)
+            {
+                pMenu->addAction(m_actions[PMA_MOVE_UP]);
+                pMenu->addAction(m_actions[PMA_MOVE_DOWN]);
+                pMenu->addSeparator();
+            }
             pMenu->addAction(m_actions[PMA_INSERT_BEFORE]);
             pMenu->addAction(m_actions[PMA_INSERT_AFTER]);
             pMenu->addSeparator();
             pMenu->addAction(m_actions[PMA_DELETE]);
+            pMenu->addSeparator();
+            pMenu->addAction(m_actions[PMA_EXPORT]);
+            if (selectedCount == 1)
+                pMenu->addAction(m_actions[PMA_REPLACE]);
         }
     }
     pMenu->exec(cursor().pos());

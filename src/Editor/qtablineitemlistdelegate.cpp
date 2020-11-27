@@ -85,7 +85,7 @@ bool QTabLineItemListDelegate::editorEvent(QEvent *event, QAbstractItemModel *mo
     if (event->type() == QEvent::MouseButtonDblClick)
     {
         QTabLineConfigDialog dlg(const_cast<QWidget*>(option.widget));
-        dlg.setTabLine(TAB_INST->getTabLineAt(index.row()));
+        dlg.setTabLine(index.row());
         dlg.setModal(true);
         dlg.show();
         dlg.exec();

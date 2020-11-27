@@ -6,7 +6,7 @@
 #include "qtablinewidget.h"
 #include <QValidator>
 
-int QTabLineConfigDialog::m_lastSetions = 4;
+double QTabLineConfigDialog::m_lastSetions = 4;
 
 QTabLineConfigDialog::QTabLineConfigDialog(QWidget *parent, TabLineConfigMode mode) :
     QDialog(parent),
@@ -14,7 +14,7 @@ QTabLineConfigDialog::QTabLineConfigDialog(QWidget *parent, TabLineConfigMode mo
     m_tlcm(mode)
 {
     ui->setupUi(this);
-    ui->lineEditSections->setValidator(new QIntValidator(1,1024,this));
+    ui->lineEditSections->setValidator(new QDoubleValidator(1.0, 1024.0, 2,this));
 
     connect(ui->widgetTabLine, &QTabLineDetailWidget::signalTabLineChanged, this, &QTabLineConfigDialog::updateInfo);
 
@@ -51,6 +51,22 @@ void QTabLineConfigDialog::initRadio(TabLineConfigMode mode)
 
 }
 
+void QTabLineConfigDialog::checkModification()
+{
+    m_lastSetions = m_ptrTabLine->sections = ui->lineEditSections->text().toDouble();
+    if (*m_ptrTabLine != *m_tlBefore)
+    {
+        int ret = QMessageBox::question(this, tr("TPF Editor"), tr("Tab line has been modified.\r\nDo you want to save your changes?"),
+                              QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                              QMessageBox::Cancel);
+        if (QMessageBox::Cancel == ret)
+            return;
+
+        if (QMessageBox::Save == ret)
+            *m_tlBefore = *m_ptrTabLine;
+    }
+}
+
 void QTabLineConfigDialog::setTabLine(TabLinePtr ptrTabLine)
 {
     m_tlBefore = ptrTabLine;
@@ -59,13 +75,26 @@ void QTabLineConfigDialog::setTabLine(TabLinePtr ptrTabLine)
     if (m_ptrTabLine.isNull())
         return;
 
-    ui->lineEditSections->setText(QString::asprintf("%d", m_ptrTabLine->sections == 0 ? m_lastSetions : m_ptrTabLine->sections));
+    ui->lineEditSections->setText(QString::asprintf("%.2f", DoubleEqual(m_ptrTabLine->sections, 0) ? m_lastSetions : m_ptrTabLine->sections));
     ui->widgetTabLine->setTabLineInfo(m_ptrTabLine);
 
     ui->lineEditBPM->setText(QString::asprintf("%d", TAB_INST->getBeatPerMinute()));
     ui->lineEditBPS->setText(QString::asprintf("%d", TAB_INST->getBeatPerSection()));
 
+    ui->pushButtonPrev->setVisible(m_tlIndex != -1);
+    ui->pushButtonSave->setVisible(m_tlIndex != -1);
+    ui->pushButtonNext->setVisible(m_tlIndex != -1);
+    ui->pushButtonPrev->setDisabled(m_tlIndex == 0);
+    ui->pushButtonNext->setDisabled(m_tlIndex >= TAB_INST->getTabLineCount());
     updateInfo();
+}
+
+void QTabLineConfigDialog::setTabLine(int index)
+{
+    m_tlIndex = index;
+    TabLinePtr tl = TAB_INST->getTabLineAt(index);
+    if (!tl.isNull())
+        setTabLine(tl);
 }
 
 int QTabLineConfigDialog::getNewTabLinePosition()
@@ -80,14 +109,39 @@ void QTabLineConfigDialog::updateInfo()
     {
         strInfo.append("Image src: ");
         strInfo.append(QStringUtil::rect2String(m_ptrTabLine->rcPos));
-        strInfo.append(QString::asprintf(" About %0.2f s", ui->lineEditSections->text().toInt() * TAB_INST->getSecondPerSection()));
+        strInfo.append(QString::asprintf(" About %0.2f s", ui->lineEditSections->text().toDouble() * TAB_INST->getSecondPerSection()));
     }
     ui->labelInfo->setText(strInfo);
 }
 
 void QTabLineConfigDialog::accept()
 {
-    m_lastSetions = m_ptrTabLine->sections = ui->lineEditSections->text().toInt();
+    on_pushButtonSave_clicked();
+    QDialog::accept();
+}
+
+void QTabLineConfigDialog::reject()
+{
+    checkModification();
+    QDialog::reject();
+}
+
+void QTabLineConfigDialog::on_lineEditSections_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    updateInfo();
+}
+
+void QTabLineConfigDialog::on_pushButtonPrev_clicked()
+{
+    checkModification();
+    if (m_tlIndex > 0)
+        setTabLine(m_tlIndex-1);
+}
+
+void QTabLineConfigDialog::on_pushButtonSave_clicked()
+{
+    m_lastSetions = m_ptrTabLine->sections = ui->lineEditSections->text().toDouble();
     *m_tlBefore = *m_ptrTabLine;
     if (m_tlcm == TLCM_NEW)
     {
@@ -107,11 +161,11 @@ void QTabLineConfigDialog::accept()
             m_newTabLinePosition = pList ? pList->getLastSelectedIndex()+1 : 0;
         }
     }
-    QDialog::accept();
 }
 
-void QTabLineConfigDialog::on_lineEditSections_textChanged(const QString &arg1)
+void QTabLineConfigDialog::on_pushButtonNext_clicked()
 {
-    Q_UNUSED(arg1);
-    updateInfo();
+    checkModification();
+    if (m_tlIndex < TAB_INST->getTabLineCount())
+        setTabLine(m_tlIndex+1);
 }

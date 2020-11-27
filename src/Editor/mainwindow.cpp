@@ -183,9 +183,10 @@ void MainWindow::on_action_Save_Project_triggered()
 
     bool bRes = TAB_INST->saveProject(strProj);
 
-    QMessageBox msg;
-    msg.setText(bRes ? tr("Project saved!") : tr("Error!"));
-    msg.exec();
+    if (bRes)
+        QMessageBox::information(this, tr("TPF Editor"), tr("Project saved!"));
+    else
+        QMessageBox::critical(this, tr("TPF Editor"), (tr("Cannot save project:\n[") + strProj + "]"));
 
     setWindowTitle(QFileUtil::getFileName(TAB_INST->currentProject()));
 }

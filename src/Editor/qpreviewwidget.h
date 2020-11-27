@@ -13,18 +13,10 @@ enum PopupMenuActionIndex
     PMA_DELETE,
     PMA_MOVE_UP,
     PMA_MOVE_DOWN,
+    PMA_EXPORT,
+    PMA_REPLACE,
 
     PMA_COUNT,
-};
-
-static const QString PopupMenuActionName[PMA_COUNT] =
-{
-    "Add image",
-    "Insert image before this",
-    "Insert image after this",
-    "Remove",
-    "Move up",
-    "Move down"
 };
 
 class QPreviewWidget : public QListView

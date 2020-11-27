@@ -14,6 +14,7 @@ void QTabLineDetailWidget::setTabLineInfo(TabLinePtr tl)
 {
     m_tl = tl;
     m_img = TAB_INST->getImage(tl->strImg);
+    update();
 }
 
 

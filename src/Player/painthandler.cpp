@@ -524,7 +524,7 @@ void QVerticalPaintHandler::paintInfo(QPainter *painter, QRect rc)
     {
         {tr("Song Time:"), QStringUtil::double2MMSS(proj->getSecondOfThisSong())},
         {tr("Speed:"), QString::asprintf("%d", proj->getBeatPerMinuteAdjusted())},
-        {tr("Sections:"), QString::asprintf("%d", tl->sections)},
+        {tr("Sections:"), QString::asprintf("%.2f", tl->sections)},
         {tr("Time:"), QString::asprintf("%.2f", proj->getSecondAtTabLine(m_iTabLine)*(1-percent))},
     };
 

@@ -96,7 +96,7 @@ bool UserConfig::getUserTpfConfig(UserTpfConfig &cfg)
         return false;
 
     QSqlQuery query(m_db);
-    QString sql("select * from " TPF_TABLE " where " TPF_PATH " =\"" TPF_PATH "\";");
+    QString sql("select * from " TPF_TABLE " where " TPF_PATH " =\"" + cfg.tpf.toLower() + "\";");
     if (query.exec(sql) && query.next())
     {
         cfg.adjustedBpm = query.record().value(TPF_ADJUSTED_SPEED).toInt();
@@ -105,6 +105,9 @@ bool UserConfig::getUserTpfConfig(UserTpfConfig &cfg)
         return true;
     }
 
+    cfg.adjustedBpm = 0;
+    cfg.fixedHeight = 0;
+    cfg.lastAccess = 0;
     return false;
 }
 

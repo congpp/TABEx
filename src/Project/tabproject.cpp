@@ -310,6 +310,35 @@ bool TABProject::removeImage(int index)
     return removeImage(m_projInfo.imgList.at(index));
 }
 
+bool TABProject::replaceImage(int index, QString newImg)
+{
+    if (index >= m_projInfo.imgList.size())
+        return false;
+
+    //Copy to project dir
+    QString strUniqueName = QString::asprintf("%lld", m_nImgID++) + QFileUtil::getFileExt(newImg);
+    QString strNewFile = m_projInfo.strWorkingPath + strUniqueName;
+    QFile::remove(strNewFile);
+    QFile::copy(newImg, strNewFile);
+
+    if (!loadImage(strUniqueName))
+        return false;
+
+    //替换列表的名字
+    QString oldImg = m_projInfo.imgList.at(index);
+    m_projInfo.imgList[index] = strUniqueName;
+
+    //tabLine替换图片
+    for (auto it3 = m_projInfo.tabLines.begin(); it3 != m_projInfo.tabLines.end(); it3++)
+    {
+        if ((*it3)->strImg == oldImg)
+            (*it3)->strImg = strUniqueName;
+    }
+
+    removeImage(oldImg);
+    return true;
+}
+
 bool TABProject::moveUpImage(QString strImg)
 {
     if (strImg.isEmpty())
@@ -385,6 +414,14 @@ QString TABProject::getImageName(int idx)
         return "";
 
     return m_projInfo.imgList.at(idx);
+}
+
+QString TABProject::getImageTempPath(int idx)
+{
+    if (idx > m_projInfo.imgList.size())
+        return "";
+
+    return getTempPath(false) + m_projInfo.imgList.at(idx);
 }
 
 QImagePtr TABProject::getImage(QString strImg)
@@ -827,7 +864,7 @@ TabLinePtr TABProject::json2TabLine(QJsonObject jsTab)
     tl->rcBlur = QStringUtil::string2Rect(jsTab["Blur"].toString());
     tl->rcOffset = QStringUtil::string2Rect(jsTab["Offset"].toString());
     tl->rcPos = QStringUtil::string2Rect(jsTab["Pos"].toString());
-    tl->sections = jsTab["sections"].toInt();
+    tl->sections = jsTab["sections"].toDouble();
     return tl;
 }
 

@@ -36,12 +36,14 @@ public:
     bool insertImage(QString strImg, int index, QString* pStrImgInProject);
     bool removeImage(QString strImg);
     bool removeImage(int index);
+    bool replaceImage(int index, QString newImg);
     //图片上移
     bool moveUpImage(QString strImg);
     bool moveDownImage(QString strImg);
     bool moveImage(int indexFrom, int indexTo);
     //获取图片
     QString   getImageName(int idx);
+    QString   getImageTempPath(int idx);
     QImagePtr getImage(QString strImg);
     QImagePtr getImage(int idx);
     QImagePtr getImagePreview(QString strImg);
