@@ -631,7 +631,7 @@ QSize QVerticalPaintHandler::getFixedImageSize(QRect &rcPaint, const QRect &rcIm
     int h=rcImg.height();
     int maxWidth = rcPaint.width();
     int maxHeight = m_szFixedTabItemUser.height();
-    if (maxHeight == 0)
+    if (maxHeight <= 0)
         maxHeight = m_szFixedTabItem.height();
 
     //先等比缩放，对齐高度。垂直播放，高度优先

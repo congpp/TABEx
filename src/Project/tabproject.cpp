@@ -763,6 +763,11 @@ bool TABProject::setCoverImg(QString strImg)
         if (pImg->isNull())
             return false;
 
+        //图片不要太大
+        if (pImg->width() > MAX_COVER_IMAGE_WIDTH)
+            *pImg = pImg->scaledToWidth(MAX_COVER_IMAGE_WIDTH, Qt::SmoothTransformation);
+        if (pImg->width() > MAX_COVER_IMAGE_HEIGHT)
+            *pImg = pImg->scaledToHeight(MAX_COVER_IMAGE_HEIGHT, Qt::SmoothTransformation);
         pImg->save(strNewFile, "PNG");
     }
     else

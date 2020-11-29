@@ -43,12 +43,9 @@ void MainWindow::initUI()
     qDebug() << TAB_INST->getSingerName();
 
     cfg.tpf = TAB_INST->currentProject();
-    if (g_userCfg->getUserTpfConfig(cfg))
-    {
-        TAB_INST->adjustSpeed(cfg.adjustedBpm);
-        ui->comboBoxLineHeight->setHeight(cfg.fixedHeight);
-    }
-
+    g_userCfg->getUserTpfConfig(cfg);
+    TAB_INST->adjustSpeed(cfg.adjustedBpm);
+    ui->comboBoxLineHeight->setHeight(cfg.fixedHeight);
 
     ui->widgetPlayer->reset();
     ui->widgetPlayer->init();

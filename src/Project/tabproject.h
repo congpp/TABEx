@@ -6,6 +6,7 @@
 #include "imagemodel.h"
 #include "projecthistory.h"
 #include <QMap>
+#include <QFile>
 
 class TABProject
 {

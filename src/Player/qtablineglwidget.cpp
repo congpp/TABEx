@@ -334,7 +334,7 @@ void QTabLineThread::run()
     //qDebug() << szScreen;
 
     ImageFilter::CGaussBlurFilter filter;
-    filter.SetSigma(15);
+    filter.SetSigma(10);
     QImage imgScreen = m_imgCoverBlur->copy();
 
     QImageBitTool bitScreen;
