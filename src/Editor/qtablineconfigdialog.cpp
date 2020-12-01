@@ -54,7 +54,7 @@ void QTabLineConfigDialog::initRadio(TabLineConfigMode mode)
 
 int QTabLineConfigDialog::checkModification()
 {
-    int ret = QMessageBox::Cancel;
+    int ret = QMessageBox::Discard;
     ui2TabLine();
     if (*m_ptrTabLine != *m_tlBefore)
     {
