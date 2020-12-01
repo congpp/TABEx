@@ -827,12 +827,12 @@ double TABProject::getSecondPerSection()
 {
     //已知：一个小节节拍数(4/4、6/8之类的分母)，每分钟节拍数(节拍器的读数)
     //那么可以算出一个小节的时间
-    return m_projInfo.beatPerSection * (60.0 / (m_projInfo.beatPerMinute + m_adjustedBeat));
+    return m_projInfo.beatPerSection * getSecondPerBeat();
 }
 
 double TABProject::getSecondPerBeat()
 {
-    return (60.0 / m_projInfo.beatPerMinute);
+    return 60.0 / (m_projInfo.beatPerMinute + m_adjustedBeat);
 }
 
 double TABProject::getSecondAtTabLine(int iTabLine)
@@ -840,7 +840,8 @@ double TABProject::getSecondAtTabLine(int iTabLine)
     if (iTabLine > m_projInfo.tabLines.size())
         return 0;
 
-    return m_projInfo.tabLines.at(iTabLine)->sections * getSecondPerSection();
+    auto tl = m_projInfo.tabLines.at(iTabLine);
+    return tl->sections * getSecondPerSection() + tl->additionalBeat * getSecondPerBeat();
 }
 
 double TABProject::getSecondOfThisSong()
@@ -855,6 +856,7 @@ QJsonObject TABProject::tabLine2Json(TabLinePtr tl)
     jsTab.insert("Offset", QStringUtil::rect2String(tl->rcOffset));
     jsTab.insert("Pos", QStringUtil::rect2String(tl->rcPos));
     jsTab.insert("sections", tl->sections);
+    jsTab.insert("additionalBeat", tl->additionalBeat);
     jsTab.insert("Img", tl->strImg);
     return jsTab;
 }
@@ -869,7 +871,8 @@ TabLinePtr TABProject::json2TabLine(QJsonObject jsTab)
     tl->rcBlur = QStringUtil::string2Rect(jsTab["Blur"].toString());
     tl->rcOffset = QStringUtil::string2Rect(jsTab["Offset"].toString());
     tl->rcPos = QStringUtil::string2Rect(jsTab["Pos"].toString());
-    tl->sections = jsTab["sections"].toDouble();
+    tl->sections = jsTab["sections"].toInt(0);
+    tl->additionalBeat = jsTab["additionalBeat"].toInt(0);
     return tl;
 }
 

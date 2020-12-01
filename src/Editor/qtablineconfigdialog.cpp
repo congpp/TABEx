@@ -6,7 +6,7 @@
 #include "qtablinewidget.h"
 #include <QValidator>
 
-double QTabLineConfigDialog::m_lastSetions = 4;
+int QTabLineConfigDialog::m_lastSetions = 4;
 
 QTabLineConfigDialog::QTabLineConfigDialog(QWidget *parent, TabLineConfigMode mode) :
     QDialog(parent),
@@ -14,7 +14,8 @@ QTabLineConfigDialog::QTabLineConfigDialog(QWidget *parent, TabLineConfigMode mo
     m_tlcm(mode)
 {
     ui->setupUi(this);
-    ui->lineEditSections->setValidator(new QDoubleValidator(1.0, 1024.0, 2,this));
+    ui->lineEditSections->setValidator(new QIntValidator(0, 1024, this));
+    ui->lineEditAdditionalBeat->setValidator(new QIntValidator(0, 1024, this));
 
     connect(ui->widgetTabLine, &QTabLineDetailWidget::signalTabLineChanged, this, &QTabLineConfigDialog::updateInfo);
 
@@ -51,20 +52,26 @@ void QTabLineConfigDialog::initRadio(TabLineConfigMode mode)
 
 }
 
-void QTabLineConfigDialog::checkModification()
+int QTabLineConfigDialog::checkModification()
 {
-    m_lastSetions = m_ptrTabLine->sections = ui->lineEditSections->text().toDouble();
+    int ret = QMessageBox::Cancel;
+    ui2TabLine();
     if (*m_ptrTabLine != *m_tlBefore)
     {
-        int ret = QMessageBox::question(this, tr("TPF Editor"), tr("Tab line has been modified.\r\nDo you want to save your changes?"),
+        ret = QMessageBox::question(this, tr("TPF Editor"), tr("Tab line has been modified.\r\nDo you want to save your changes?"),
                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
                               QMessageBox::Cancel);
-        if (QMessageBox::Cancel == ret)
-            return;
 
         if (QMessageBox::Save == ret)
             *m_tlBefore = *m_ptrTabLine;
     }
+    return ret;
+}
+
+void QTabLineConfigDialog::ui2TabLine()
+{
+    m_lastSetions = m_ptrTabLine->sections = ui->lineEditSections->text().toInt();
+    m_ptrTabLine->additionalBeat = ui->lineEditAdditionalBeat->text().toInt();
 }
 
 void QTabLineConfigDialog::setTabLine(TabLinePtr ptrTabLine)
@@ -75,7 +82,9 @@ void QTabLineConfigDialog::setTabLine(TabLinePtr ptrTabLine)
     if (m_ptrTabLine.isNull())
         return;
 
-    ui->lineEditSections->setText(QString::asprintf("%.2f", DoubleEqual(m_ptrTabLine->sections, 0) ? m_lastSetions : m_ptrTabLine->sections));
+    //tabline 2 ui
+    ui->lineEditSections->setText(QString::asprintf("%d", (m_ptrTabLine->sections == 0) ? m_lastSetions : m_ptrTabLine->sections));
+    ui->lineEditAdditionalBeat->setText(QString::asprintf("%d", m_ptrTabLine->additionalBeat));
     ui->widgetTabLine->setTabLineInfo(m_ptrTabLine);
 
     ui->lineEditBPM->setText(QString::asprintf("%d", TAB_INST->getBeatPerMinute()));
@@ -91,10 +100,12 @@ void QTabLineConfigDialog::setTabLine(TabLinePtr ptrTabLine)
 
 void QTabLineConfigDialog::setTabLine(int index)
 {
-    m_tlIndex = index;
     TabLinePtr tl = TAB_INST->getTabLineAt(index);
     if (!tl.isNull())
+    {
+        m_tlIndex = index;
         setTabLine(tl);
+    }
 }
 
 int QTabLineConfigDialog::getNewTabLinePosition()
@@ -122,7 +133,9 @@ void QTabLineConfigDialog::accept()
 
 void QTabLineConfigDialog::reject()
 {
-    checkModification();
+    if (QMessageBox::Cancel == checkModification())
+        return;
+
     QDialog::reject();
 }
 
@@ -141,7 +154,7 @@ void QTabLineConfigDialog::on_pushButtonPrev_clicked()
 
 void QTabLineConfigDialog::on_pushButtonSave_clicked()
 {
-    m_lastSetions = m_ptrTabLine->sections = ui->lineEditSections->text().toDouble();
+    ui2TabLine();
     *m_tlBefore = *m_ptrTabLine;
     if (m_tlcm == TLCM_NEW)
     {

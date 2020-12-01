@@ -156,6 +156,9 @@ background-repeat: no;</string>
               <height>26</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string/>
+            </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
     border: 0px;
@@ -197,6 +200,9 @@ QPushButton:disabled {
               <width>26</width>
               <height>26</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string/>
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
@@ -318,6 +324,9 @@ background-color: rgba(0, 0, 0, 64);
               <height>26</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>Open</string>
+            </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
     border: 0px;
@@ -358,6 +367,9 @@ QPushButton:disabled {
               <width>26</width>
               <height>26</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string>Previous tab</string>
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
@@ -400,6 +412,9 @@ QPushButton:disabled {
               <height>26</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>Play/Pause</string>
+            </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
     border: 0px;
@@ -440,6 +455,9 @@ QPushButton:disabled {
               <width>26</width>
               <height>26</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string>Next tab</string>
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
@@ -503,6 +521,9 @@ QSlider::sub-page:vertical {
           </item>
           <item>
            <widget class="QLineHeightComboBox" name="comboBoxLineHeight">
+            <property name="toolTip">
+             <string>Tab line height</string>
+            </property>
             <property name="editable">
              <bool>true</bool>
             </property>

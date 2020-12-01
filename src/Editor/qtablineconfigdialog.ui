@@ -121,6 +121,16 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Additional Beat(s):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditAdditionalBeat"/>
+       </item>
       </layout>
      </item>
     </layout>

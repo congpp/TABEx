@@ -26,6 +26,9 @@ public slots:
     void accept();
     void slotSingerImgBtnClicked(bool b);
     void slotCoverImgBtnClicked(bool b);
+private slots:
+    void on_pushButtonSearchCover_clicked();
+    void on_pushButtonSearchSinger_clicked();
 };
 
 #endif // QPROJECTCONFIGDIALOG_H

@@ -1,10 +1,13 @@
 ﻿#include "qprojectconfigdialog.h"
 #include "ui_qprojectconfigdialog.h"
 #include "../Project/tabproject.h"
+#include "qimagebutton.h"
 #include <QFileDialog>
 #include <QCloseEvent>
 #include <QValidator>
-#include "qimagebutton.h"
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 QProjectConfigDialog::QProjectConfigDialog(QWidget *parent) :
     QDialog(parent),
@@ -79,4 +82,37 @@ void QProjectConfigDialog::slotCoverImgBtnClicked(bool b)
         //TAB_INST->setCoverImg(strImg);
         ui->btnCoverImg->setImage(strImg);
     }
+}
+
+void QProjectConfigDialog::on_pushButtonSearchCover_clicked()
+{
+    QString music163("https://music.163.com/#/search/m/?id=1344897943&s=%1&type=1");
+    QString title = ui->textEditTitle->text();
+    if (title.isEmpty())
+        return;
+
+    QUrl url(music163.arg(title));
+    QNetworkAccessManager m_qnam;
+    QNetworkRequest qnr(url);
+    QNetworkReply* reply = m_qnam.get(qnr);
+    QEventLoop eventLoop;
+    connect(reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit);
+    eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+    QByteArray replyData = reply->readAll();
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QVariant redirectAttr = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    if (reply->error())
+        qDebug() << "Error open url: " << reply->errorString();
+    else if ((statusCode >= 300 && statusCode < 399) || !redirectAttr.isNull())
+        qDebug()<<"Error redirect";
+    else
+        qDebug() << QString(replyData);
+
+    reply->deleteLater();
+    reply = nullptr;
+}
+
+void QProjectConfigDialog::on_pushButtonSearchSinger_clicked()
+{
+
 }

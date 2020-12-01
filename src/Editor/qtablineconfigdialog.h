@@ -33,7 +33,8 @@ public slots:
 
 protected:
     void initRadio(TabLineConfigMode mode);
-    void checkModification();
+    int checkModification();
+    void ui2TabLine();
 private slots:
     void on_lineEditSections_textChanged(const QString &arg1);
 
@@ -48,7 +49,7 @@ private:
     TabLinePtr m_tlBefore;
     int        m_tlIndex = -1;
 
-    static double m_lastSetions;
+    static int m_lastSetions;
 
     TabLineConfigMode m_tlcm;
     int m_newTabLinePosition = -1;

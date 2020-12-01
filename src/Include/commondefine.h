@@ -35,7 +35,8 @@ static const QColor CLR_FG(0, 162, 232, 128);
 //把一整张乐谱分割成N个TabLine，分割的时候把跳转处理好，就可以从头到尾播放了
 struct TabLine
 {
-    double  sections = 0;   //这行有多少个小节，改成小数了，因为某行可能存在半个小节之类的
+    int sections = 0;   //这行有多少个小节
+    int additionalBeat = 0;  //额外多几拍，比如：很多情况，4/4的谱子常出现6/4之类的小节，用来抒情额
     QString strImg;     //图片路径
     QRect   rcPos;      //图片区域
     QRect   rcOffset;   //显示时的偏移
@@ -43,14 +44,14 @@ struct TabLine
 
     bool operator==(const TabLine& r)
     {
-        return DoubleEqual(sections, r.sections) && strImg == r.strImg && rcPos == r.rcPos
-                && rcOffset == r.rcOffset && rcBlur == r.rcBlur;
+        return sections == r.sections && additionalBeat == r.additionalBeat && strImg == r.strImg
+                && rcPos == r.rcPos && rcOffset == r.rcOffset && rcBlur == r.rcBlur;
     }
 
     bool operator!=(const TabLine& r)
     {
-        return !DoubleEqual(sections, r.sections) || strImg != r.strImg || rcPos != r.rcPos
-                || rcOffset != r.rcOffset || rcBlur != r.rcBlur;
+        return sections != r.sections || additionalBeat != r.additionalBeat || strImg != r.strImg
+                || rcPos != r.rcPos || rcOffset != r.rcOffset || rcBlur != r.rcBlur;
     }
 };
 
