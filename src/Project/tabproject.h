@@ -114,8 +114,8 @@ public:
     //辅助接口
     int getSectionCount();
 
-    inline double getSecondPerSection();
-    inline double getSecondPerBeat();
+    double getSecondPerSection();
+    double getSecondPerBeat();
     double getSecondAtTabLine(int iTabLine);
     double getSecondOfThisSong();
 
