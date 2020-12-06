@@ -28,9 +28,9 @@
 #### 设计
 没有UI，走一步是一步吧
 1. 播放器目前的样子↓
-![image](https://raw.githubusercontent.com/congpp/TABEx/main/etc/player.png)
+![image](https://github.com/congpp/TABEx/raw/main/etc/player.png)
 2. 编辑器目前的样子↓
-![image](https://raw.githubusercontent.com/congpp/TABEx/main/etc/editor.png)
+![image](https://github.com/congpp/TABEx/raw/main/etc/editor.PNG)
 
 ### 移动端
   * 以后再说
